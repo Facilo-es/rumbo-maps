@@ -1,0 +1,35 @@
+[
+  {
+    "place_id": 1,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "node",
+    "osm_id": 1,
+    "lat": "40.4166949",
+    "lon": "-3.7064218",
+    "category": "place",
+    "type": "house",
+    "place_rank": 30,
+    "importance": 0.0001,
+    "addresstype": "place",
+    "name": "",
+    "display_name": "1, Calle Mayor, Sol, Centro, Madrid, Comunidad de Madrid, 28013, España",
+    "address": {
+      "house_number": "1",
+      "road": "Calle Mayor",
+      "quarter": "Sol",
+      "city_district": "Centro",
+      "city": "Madrid",
+      "state": "Comunidad de Madrid",
+      "ISO3166-2-lvl4": "ES-MD",
+      "postcode": "28013",
+      "country": "España",
+      "country_code": "es"
+    },
+    "boundingbox": [
+      "40.4166449",
+      "40.4167449",
+      "-3.7064718",
+      "-3.7063718"
+    ]
+  }
+]

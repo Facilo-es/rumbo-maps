@@ -1,0 +1,62 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "address.fixture",
+      "text": "Calle Mayor",
+      "address": "1",
+      "place_name": "Calle Mayor 1, 28013 Madrid, Comunidad de Madrid, España",
+      "place_type": [
+        "address"
+      ],
+      "center": [
+        -3.7064218,
+        40.4166949
+      ],
+      "bbox": [
+        -3.7064218,
+        40.4166949,
+        -3.7064218,
+        40.4166949
+      ],
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.7064218,
+          40.4166949
+        ]
+      },
+      "properties": {
+        "country_code": "es",
+        "kind": "road"
+      },
+      "context": [
+        {
+          "id": "postal_code.1",
+          "text": "28013"
+        },
+        {
+          "id": "municipality.2",
+          "text": "Madrid"
+        },
+        {
+          "id": "region.3",
+          "text": "Comunidad de Madrid"
+        },
+        {
+          "id": "country.4",
+          "text": "España",
+          "country_code": "es"
+        }
+      ]
+    }
+  ],
+  "query": [
+    "calle",
+    "mayor",
+    "1",
+    "madrid"
+  ],
+  "attribution": "© MapTiler © OpenStreetMap contributors"
+}

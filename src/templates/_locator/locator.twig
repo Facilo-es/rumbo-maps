@@ -1,0 +1,131 @@
+{#
+  Rumbo Maps store locator. Works without JavaScript: the GET form and the server-rendered list.
+  With JavaScript (rumbo-loader.js) it searches in place, shows the map and keeps cards and markers in sync.
+  Override any part by copying it to templates/_rumbo/locator/ in your project.
+  Variables: see web/CONTRACT.md.
+#}
+{%- set id = id ?? ('rumbo-locator-' ~ random(100000, 999999)) -%}
+{%- set look = { mapFirst: 'first', first: 'first', side: 'side', list: 'list' }[look ?? 'side'] ?? 'side' -%}
+{%- set config = config ?? {} -%}
+{%- set unit = (unit ?? config.unit ?? 'km') == 'mi' ? 'mi' : 'km' -%}
+{%- set results = results ?? initialResults ?? config.results ?? [] -%}
+{%- set origin = origin ?? config.origin ?? null -%}
+{%- set nearest = nearest ?? null -%}
+{%- set within = within ?? null -%}
+{%- set q = q ?? craft.app.request.getQueryParam('q') -%}
+{%- set filters = filters ?? [] -%}
+{%- set consentRequired = consentRequired ?? false -%}
+{%- set staticUrl = staticUrl ?? null -%}
+{%- set heading = heading ?? null -%}
+{%- set intro = intro ?? null -%}
+{%- set radiusOptions = radiusOptions ?? [5, 10, 25, 50, 100] -%}
+{%- set defaultRadius = craft.app.request.getQueryParam('radius') ?: (within ?? defaultRadius ?? 25) -%}
+{%- set provider = provider ?? 'OpenFreeMap' -%}
+{%- set corners = corners ?? 'round' -%}
+{%- set cardHeading = cardHeading ?? (heading ? 'h3' : 'h2') -%}
+
+{%- set s = {
+  placeholder: 'Town, postcode or address'|t('rumbo-maps'),
+  search: 'Search'|t('rumbo-maps'),
+  useLocation: 'Use my location'|t('rumbo-maps'),
+  directions: 'Directions'|t('rumbo-maps'),
+  details: 'Details'|t('rumbo-maps'),
+  countMany: '{n} locations near {place}'|t('rumbo-maps'),
+  countOne: '1 location near {place}'|t('rumbo-maps'),
+  countManyYou: '{n} locations near you'|t('rumbo-maps'),
+  countOneYou: '1 location near you'|t('rumbo-maps'),
+  countManyAll: '{n} locations'|t('rumbo-maps'),
+  countOneAll: '1 location'|t('rumbo-maps'),
+  awayKm: '{distance} km away'|t('rumbo-maps'),
+  awayMi: '{distance} mi away'|t('rumbo-maps'),
+  km: 'km'|t('rumbo-maps'),
+  mi: 'mi'|t('rumbo-maps'),
+  none: 'Nothing within {within} {unit}. The nearest is {title}, {distance} away.'|t('rumbo-maps'),
+  noneAtAll: 'Nothing within {within} {unit}.'|t('rumbo-maps'),
+  locErr: 'We couldn\'t get your location. Type a town or postcode instead.'|t('rumbo-maps'),
+  findErr: 'We couldn\'t find that place. Check the spelling or try a postcode.'|t('rumbo-maps'),
+  failed: 'Search isn\'t working right now. Please try again in a moment.'|t('rumbo-maps'),
+  cluster: '{n} locations, zoom in'|t('rumbo-maps'),
+}|merge(config.strings ?? {})|merge(strings ?? {}) -%}
+
+{%- set jsConfig = config|merge({
+  lang: config.lang ?? craft.app.language,
+  look: look,
+  unit: unit,
+  endpoint: endpoint ?? config.endpoint ?? actionUrl('rumbo-maps/locator/search'),
+  results: results,
+  origin: origin,
+  mapStyle: mapStyle ?? config.mapStyle ?? config.style ?? 'positron',
+  cardHeading: cardHeading,
+  accentColor: accentColor ?? config.accentColor ?? null,
+  strings: s,
+}) -%}
+
+{%- set classes = ['rumbo', 'rumbo--' ~ look]
+  |merge(corners == 'square' ? ['rumbo--square'] : [])
+  |merge((fontInherit ?? false) ? ['rumbo--font-inherit'] : []) -%}
+
+<section id="{{ id }}" class="{{ classes|join(' ') }}" data-rumbo-locator
+  {%- if consentRequired %} data-rumbo-consent="required" data-rumbo-provider="{{ provider }}"{% endif %}
+  {%- if staticUrl %} data-rumbo-static="{{ staticUrl }}"{% endif %}
+  {%- if heading %} aria-labelledby="{{ id }}-h"{% else %} aria-label="{{ 'Find a location'|t('rumbo-maps') }}"{% endif %}>
+  <script type="application/json" data-rumbo-config>{{ jsConfig|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
+
+  {%- if heading or intro %}
+  <header class="rumbo__head">
+    {%- if heading %}<h2 class="rumbo__h" id="{{ id }}-h">{{ heading }}</h2>{% endif %}
+    {%- if intro %}<p class="rumbo__intro">{{ intro }}</p>{% endif %}
+  </header>
+  {%- endif %}
+
+  <div class="rumbo__body">
+    <div class="rumbo__side">
+      {% include ['_rumbo/locator/_form', 'rumbo-maps/_locator/_form'] %}
+
+      <p class="rumbo-msg{{ error ?? false ? ' rumbo-msg--error' : (not results|length and q ? ' rumbo-msg--empty' : '') }}" data-r="msg" role="status"{% if not (error ?? false) and (results|length or not q) %} hidden{% endif %}>
+        {%- if error ?? false -%}
+          {{ error }}
+        {%- elseif not results|length and q -%}
+          {%- if nearest -%}
+            {{ 'Nothing within {within} {unit}. The nearest is {title}, {distance} away.'|t('rumbo-maps', {within: within ?? defaultRadius, unit: unit|t('rumbo-maps'), title: nearest.title, distance: (nearest.distance < 10 ? nearest.distance|round(1) : nearest.distance|round) ~ ' ' ~ unit|t('rumbo-maps')}) }}
+          {%- else -%}
+            {{ 'Nothing within {within} {unit}.'|t('rumbo-maps', {within: within ?? defaultRadius, unit: unit|t('rumbo-maps')}) }}
+          {%- endif -%}
+        {%- endif -%}
+      </p>
+      {%- set shown = results|length ? results : (nearest and q ? [nearest] : []) %}
+      <p class="rumbo-count" data-r="count" aria-live="polite">
+        {%- if results|length -%}
+          {%- set n = total ?? results|length -%}
+          {%- if origin and origin.label ?? false -%}
+            {{ (n == 1 ? '1 location near {place}' : '{n} locations near {place}')|t('rumbo-maps', {n: n, place: origin.label}) }}
+          {%- elseif origin -%}
+            {{ (n == 1 ? '1 location near you' : '{n} locations near you')|t('rumbo-maps', {n: n}) }}
+          {%- else -%}
+            {{ (n == 1 ? '1 location' : '{n} locations')|t('rumbo-maps', {n: n}) }}
+          {%- endif -%}
+        {%- endif -%}
+      </p>
+      <ol class="rumbo-list" data-r="list">
+        {%- for result in shown %}
+          {% include ['_rumbo/locator/_card', 'rumbo-maps/_locator/_card'] with { result: result, index: loop.index, unit: unit, s: s, cardHeading: cardHeading } only %}
+        {%- endfor %}
+      </ol>
+    </div>
+
+    {%- if look != 'list' %}
+    <div class="rumbo-map" data-r="map" aria-label="{{ 'Map of the results'|t('rumbo-maps') }}" role="region">
+      {%- if consentRequired %}
+      <div class="rumbo-consent" data-rumbo-placeholder hidden>
+        {%- if staticUrl %}<img class="rumbo-consent__img" src="{{ staticUrl }}" alt="">{% endif %}
+        <div class="rumbo-consent__box">
+          <p>{{ 'This map is provided by {provider}. Loading it sends your IP address to them.'|t('rumbo-maps', {provider: provider}) }}</p>
+          <button type="button" class="rumbo-btn" data-rumbo-show>{{ 'Show map'|t('rumbo-maps') }}</button>
+          <button type="button" class="rumbo-link" data-rumbo-always>{{ 'Always show maps on this site'|t('rumbo-maps') }}</button>
+        </div>
+      </div>
+      {%- endif %}
+    </div>
+    {%- endif %}
+  </div>
+</section>

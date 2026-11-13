@@ -1,0 +1,9 @@
+{% import '_includes/forms' as forms %}
+{{ forms.textField({ label: 'Default latitude'|t('rumbo-maps'), name: 'defaultLat', value: field.defaultLat, errors: field.getErrors('defaultLat') }) }}
+{{ forms.textField({ label: 'Default longitude'|t('rumbo-maps'), name: 'defaultLng', value: field.defaultLng, errors: field.getErrors('defaultLng') }) }}
+{{ forms.textField({ label: 'Default zoom'|t('rumbo-maps'), name: 'defaultZoom', value: field.defaultZoom, size: 4 }) }}
+{{ forms.textField({ label: 'Map height in the editor (px)'|t('rumbo-maps'), name: 'editorHeight', value: field.editorHeight, size: 6 }) }}
+{{ forms.textField({ label: 'Only suggest addresses in these countries'|t('rumbo-maps'), instructions: 'Two-letter codes, separated by commas. Example: es, pt'|t('rumbo-maps'), name: 'countries', value: field.countries|join(', ') }) }}
+{{ forms.textField({ label: 'Search bias area'|t('rumbo-maps'), instructions: 'Address search prefers places inside this box. Four numbers: west longitude, south latitude, east longitude, north latitude. Example for mainland Spain: -9.4, 35.9, 3.4, 43.8. Leave empty to search everywhere.'|t('rumbo-maps'), name: 'searchBias', value: field.searchBias ? field.searchBias|join(', ') : '', placeholder: '-9.4, 35.9, 3.4, 43.8' }) }}
+{{ forms.lightswitchField({ label: 'Show latitude and longitude'|t('rumbo-maps'), name: 'showLatLng', on: field.showLatLng }) }}
+{{ forms.lightswitchField({ label: 'Service radius'|t('rumbo-maps'), instructions: 'Let editors set a radius per location, for businesses that travel to their customers. Pages can then ask which locations cover an address.'|t('rumbo-maps'), name: 'serviceRadius', on: field.serviceRadius, offLabel: 'Off'|t('rumbo-maps'), onLabel: 'On'|t('rumbo-maps') }) }}

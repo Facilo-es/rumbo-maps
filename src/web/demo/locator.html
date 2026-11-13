@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rumbo Maps · demo del buscador de tiendas</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; font-src 'self' https://tiles.openfreemap.org">
+<link rel="stylesheet" href="../dist/rumbo-locator.css">
+<link rel="stylesheet" href="demo.css">
+<script src="stub.js"></script>
+<script src="../dist/rumbo-loader.js" defer></script>
+</head><body>
+<main class="demo">
+<section id="rumbo-demo" class="rumbo rumbo--side" data-rumbo-locator>
+<script type="application/json" data-rumbo-config>{"lang": "es", "look": "side", "unit": "km", "endpoint": "/actions/rumbo-maps/locator/search", "limit": 20, "results": [{"id": 1, "lat": 40.4262, "lng": -3.7055, "title": "Grano Malasaña", "address": "Calle del Pez 12, 28004 Madrid", "distance": 1.24, "url": "/cafes/malasana", "directionsUrl": "https://www.openstreetmap.org/directions?route=%3B40.4262%2C-3.7055", "fields": {"hours": "Open until 20:00", "wifi": "Wi-Fi"}}, {"id": 2, "lat": 40.4114, "lng": -3.6945, "title": "Grano Huertas", "address": "Calle de las Huertas 40, 28014 Madrid", "distance": 3.08, "url": "/cafes/huertas"}, {"id": 3, "lat": 40.4531, "lng": -3.6883, "title": "Grano Chamartín", "address": "Calle de Alberto Alcocer 5, 28036 Madrid", "distance": 12.6}], "origin": {"label": "Madrid", "lat": 40.4168, "lng": -3.7038}, "mapStyle": "positron", "strings": {"placeholder": "Ciudad, dirección o código postal", "search": "Buscar", "useLocation": "Usar mi ubicación", "km": "km", "mi": "mi", "countMany": "{n} ubicaciones cerca de {place}", "awayKm": "a {distance} km", "directions": "Cómo llegar", "details": "Ver detalles"}}</script>
+<header class="rumbo__head"><h2 class="rumbo__h">Encuentra tu cafetería</h2><p class="rumbo__intro">Busca por ciudad o código postal y ve la más cercana.</p></header>
+<form class="rumbo-form" data-r="form" method="get" role="search">
+<input type="hidden" name="l" value="demo-token">
+<div class="rumbo-form__row"><label class="rumbo-sr" for="rumbo-demo-q">Ciudad, dirección o código postal</label>
+<input class="rumbo-input" id="rumbo-demo-q" type="search" name="q" value="Madrid" placeholder="Ciudad, dirección o código postal" enterkeyhint="search" maxlength="120">
+<button class="rumbo-btn" type="submit">Buscar</button></div>
+<div class="rumbo-form__tools"><button class="rumbo-me" type="button" data-r="me" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>Usar mi ubicación</button>
+<label class="rumbo-radius"><span>Dentro de</span><select class="rumbo-select" name="radius"><option value="10">10 km</option><option value="25" selected>25 km</option><option value="50">50 km</option></select></label>
+<input type="hidden" name="unit" value="km"></div>
+<div class="rumbo-filters"><fieldset class="rumbo-chips"><legend class="rumbo-sr">Servicios</legend>
+<label class="rumbo-chip"><input type="checkbox" name="filters[type][]" value="coffee">Café de especialidad</label>
+<label class="rumbo-chip"><input type="checkbox" name="filters[type][]" value="wifi">Wi-Fi</label>
+<label class="rumbo-chip"><input type="checkbox" name="filters[type][]" value="terrace">Terraza</label></fieldset>
+<button class="rumbo-btn rumbo-filters__go" type="submit">Aplicar</button></div>
+</form>
+<div class="rumbo__body"><div class="rumbo__side">
+<p class="rumbo-msg" data-r="msg" role="status" hidden></p>
+<p class="rumbo-count" data-r="count" aria-live="polite">3 ubicaciones cerca de Madrid</p>
+<ol class="rumbo-list" data-r="list">
+<li class="rumbo-card" data-id="1" tabindex="0"><span class="rumbo-card__n">1</span><div class="rumbo-card__body"><h3 class="rumbo-card__t">Grano Malasaña</h3><p class="rumbo-card__a">Calle del Pez 12, 28004 Madrid</p><p class="rumbo-card__links"><a class="rumbo-card__dir" href="https://www.openstreetmap.org/directions?route=%3B40.4262%2C-3.7055">Cómo llegar</a><a class="rumbo-card__url" href="/cafes/malasana">Ver detalles</a></p></div><p class="rumbo-card__d">a <b>1,2</b> km</p></li>
+<li class="rumbo-card" data-id="2" tabindex="0"><span class="rumbo-card__n">2</span><div class="rumbo-card__body"><h3 class="rumbo-card__t">Grano Huertas</h3><p class="rumbo-card__a">Calle de las Huertas 40, 28014 Madrid</p><p class="rumbo-card__links"><a class="rumbo-card__dir" href="#">Cómo llegar</a><a class="rumbo-card__url" href="/cafes/huertas">Ver detalles</a></p></div><p class="rumbo-card__d">a <b>3,1</b> km</p></li>
+<li class="rumbo-card" data-id="3" tabindex="0"><span class="rumbo-card__n">3</span><div class="rumbo-card__body"><h3 class="rumbo-card__t">Grano Chamartín</h3><p class="rumbo-card__a">Calle de Alberto Alcocer 5, 28036 Madrid</p><p class="rumbo-card__links"><a class="rumbo-card__dir" href="#">Cómo llegar</a></p></div><p class="rumbo-card__d">a <b>13</b> km</p></li>
+</ol></div>
+<div class="rumbo-map" data-r="map" role="region" aria-label="Mapa de resultados"></div></div>
+</section>
+</main></body></html>

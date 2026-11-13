@@ -1,0 +1,15 @@
+{# Single location page: values the old plugin exposed. entry.myMap.embed() in a comment is ignored #}
+{% set map = entry.myMap %}
+<h1>{{ entry.title }}</h1>
+<p>{{ entry.myMap.address }}</p>
+<p>{{ map.parts.number }} {{ map.parts.address }}, {{ map.parts.postcode }} {{ map.parts.city }}</p>
+<p>{{ map.streetAddress }}</p>
+<p>{{ map.city }}, {{ map.county }}, {{ map.state }}, {{ map.country }}</p>
+<meta itemprop="latitude" content="{{ map.lat }}">
+<meta itemprop="longitude" content="{{ map.lng }}">
+<span data-zoom="{{ map.zoom }}">{{ map.postcode }} {{ map.number }}</span>
+<p>Text outside tags: map.lat and entry.myMap.img() are not Twig.</p>
+{{ entry.myMap.embed({ zoom: 14, height: 300 }) }}
+<img src="{{ entry.myMap.img({ width: 600, height: 300 }) }}"
+     srcset="{{ entry.myMap.imgSrcSet({ width: 600, height: 300 }) }}" alt="">
+{{ 'entry.myMap.parts.city inside a string' }}

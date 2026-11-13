@@ -1,0 +1,18 @@
+{#- One result card. Needs: result, index (1-based), unit, s (strings), cardHeading. Matches cardHtml() in web/src/locator.js. -#}
+{%- set h = cardHeading in ['h2','h3','h4','h5','h6'] ? cardHeading : 'h3' -%}
+{%- set dir = result.directionsUrl ?? ('https://www.openstreetmap.org/directions?route=%3B' ~ result.lat ~ '%2C' ~ result.lng) -%}
+<li class="rumbo-card" tabindex="0" data-rumbo-id="{{ result.id }}" data-lat="{{ result.lat }}" data-lng="{{ result.lng }}">
+  <span class="rumbo-card__n" aria-hidden="true">{{ index }}</span>
+  <{{ h }} class="rumbo-card__t">{{ result.title }}</{{ h }}>
+  {%- if result.distance is defined and result.distance is not null and result.distance != '' %}
+  {%- set d = result.distance < 10 ? result.distance|round(1) : result.distance|round %}
+  <span class="rumbo-card__d">{{ (unit == 'mi' ? s.awayMi : s.awayKm)|replace({'{distance}': '<b>' ~ d|number(d == d|round ? 0 : 1)|e ~ '</b>'})|raw }}</span>
+  {%- endif %}
+  {%- if result.address ?? false %}<p class="rumbo-card__a">{{ result.address }}</p>{% endif %}
+  {%- set meta = (result.fields ?? {})|filter(v => v is not iterable and v is not null and v != '') %}
+  {%- if meta|length %}<p class="rumbo-card__meta">{% for v in meta %}<span>{{ v }}</span>{% endfor %}</p>{% endif %}
+  <p class="rumbo-card__links">
+    <a class="rumbo-card__dir" href="{{ dir }}" target="_blank" rel="noopener">{{ s.directions }}<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    {%- if result.url ?? false %}<a class="rumbo-card__url" href="{{ result.url }}">{{ s.details }}</a>{% endif %}
+  </p>
+</li>

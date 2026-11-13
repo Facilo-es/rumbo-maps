@@ -1,0 +1,25 @@
+{% extends '_layouts/cp' %}
+{% set title = 'Search insights'|t('rumbo-maps') %}
+{% block actionButton %}<a class="btn" href="{{ actionUrl('rumbo-maps/insights/csv', { from: from, to: to }) }}">{{ 'Download CSV'|t('rumbo-maps') }}</a>{% endblock %}
+{% block content %}
+{% if not isPro %}
+  <p>{{ 'Search insights come with Rumbo Maps Pro. They show where people look for you, and where they found no store nearby.'|t('rumbo-maps') }}</p>
+{% else %}
+  <form method="get" class="flex"><input class="text" type="date" name="from" value="{{ from }}"> – <input class="text" type="date" name="to" value="{{ to }}"><button class="btn">{{ 'Show'|t('rumbo-maps') }}</button></form>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,220px));gap:24px;margin:24px 0">
+    <div class="pane" style="margin:0"><p class="light">{{ 'Searches'|t('rumbo-maps') }}</p><p style="font-size:28px;font-weight:600;margin:0">{{ summary.searches|number }}</p></div>
+    <div class="pane" style="margin:0"><p class="light">{{ 'No store nearby'|t('rumbo-maps') }}</p><p style="font-size:28px;font-weight:600;margin:0">{{ summary.noResults|number }}</p></div>
+    <div class="pane" style="margin:0"><p class="light">{{ 'Used “my location”'|t('rumbo-maps') }}</p><p style="font-size:28px;font-weight:600;margin:0">{{ summary.usedMyLocation|number }}</p></div>
+  </div>
+  {% if map %}<div data-rumbo-insights-map style="margin-bottom:24px">{{ map|raw }}
+    <p class="light" style="margin-top:6px"><span style="color:#2563eb">●</span> {{ 'Searched places'|t('rumbo-maps') }} &nbsp; <span style="color:#dc2626">●</span> {{ 'Nothing nearby'|t('rumbo-maps') }}</p></div>{% endif %}
+  <div class="flex" style="gap:24px;align-items:flex-start">
+    <div style="flex:1"><h2>{{ 'Most searched places'|t('rumbo-maps') }}</h2>
+      <table class="data fullwidth"><tbody>{% for p in summary.top %}<tr><td>{{ p.placeLabel ?: '—' }}</td><td class="thin">{{ p.n|number }}</td></tr>{% else %}<tr><td class="light">{{ 'No searches yet.'|t('rumbo-maps') }}</td></tr>{% endfor %}</tbody></table></div>
+    <div style="flex:1"><h2>{{ 'Where people found nothing'|t('rumbo-maps') }}</h2>
+      <p class="light">{{ 'Places where customers looked for you and had no store nearby. A good list for your next opening.'|t('rumbo-maps') }}</p>
+      <table class="data fullwidth"><tbody>{% for p in summary.missed %}<tr><td>{{ p.placeLabel ?: '—' }}</td><td class="thin">{{ p.n|number }}</td></tr>{% else %}<tr><td class="light">{{ 'Nobody has come up empty.'|t('rumbo-maps') }}</td></tr>{% endfor %}</tbody></table></div>
+  </div>
+  <p class="light">{{ 'Only the town or postcode is kept, never what people typed or their exact position.'|t('rumbo-maps') }}</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{#- Search form. A plain GET form, so it works without JavaScript. Needs: id, q, token, unit, radiusOptions, defaultRadius, filters, s. -#}
+<form class="rumbo-form" data-r="form" method="get" role="search">
+  <input type="hidden" name="l" value="{{ token ?? '' }}">
+  <div class="rumbo-form__row">
+    <label class="rumbo-sr" for="{{ id }}-q">{{ s.placeholder }}</label>
+    <input class="rumbo-input" id="{{ id }}-q" type="search" name="q" value="{{ q }}" placeholder="{{ s.placeholder }}" enterkeyhint="search" maxlength="120">
+    <button class="rumbo-btn" type="submit">{{ s.search }}</button>
+  </div>
+  <div class="rumbo-form__tools">
+    <button class="rumbo-me" type="button" data-r="me" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
+      {{ s.useLocation }}
+    </button>
+    <label class="rumbo-radius">
+      <span>{{ 'Within'|t('rumbo-maps') }}</span>
+      <select class="rumbo-select" name="radius">
+        {%- for r in radiusOptions %}
+        <option value="{{ r }}"{% if r == defaultRadius %} selected{% endif %}>{{ r }} {{ unit == 'mi' ? s.mi : s.km }}</option>
+        {%- endfor %}
+      </select>
+    </label>
+    <input type="hidden" name="unit" value="{{ unit }}">
+  </div>
+  {%- if filters|length %}
+  <div class="rumbo-filters">
+    {%- for f in filters %}
+    {%- set chosen = (craft.app.request.getQueryParam('filters') ?? {})[f.handle] ?? [] %}
+    <fieldset class="rumbo-chips">
+      <legend class="rumbo-sr">{{ f.label }}</legend>
+      {%- for o in f.options %}
+      {%- set on = (o.selected ?? false) or o.value in chosen %}
+      <label class="rumbo-chip{{ on ? ' is-on' }}"><input type="checkbox" name="filters[{{ f.handle }}][]" value="{{ o.value }}"{% if on %} checked{% endif %}>{{ o.label }}</label>
+      {%- endfor %}
+    </fieldset>
+    {%- endfor %}
+    <button class="rumbo-btn rumbo-filters__go" type="submit">{{ 'Apply'|t('rumbo-maps') }}</button>
+  </div>
+  {%- endif %}
+</form>

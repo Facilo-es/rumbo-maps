@@ -1,0 +1,235 @@
+{
+    "findings": [
+        {
+            "file": "_location.twig",
+            "line": 4,
+            "call": "entry.myMap.address",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 5,
+            "call": "map.parts.number",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 5,
+            "call": "map.parts.address",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 5,
+            "call": "map.parts.postcode",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 5,
+            "call": "map.parts.city",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 6,
+            "call": "map.streetAddress",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 7,
+            "call": "map.city",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 7,
+            "call": "map.county",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 7,
+            "call": "map.state",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 7,
+            "call": "map.country",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 8,
+            "call": "map.lat",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 9,
+            "call": "map.lng",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 10,
+            "call": "map.zoom",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 10,
+            "call": "map.postcode",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 10,
+            "call": "map.number",
+            "badge": "lite",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 12,
+            "call": "entry.myMap.embed()",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 13,
+            "call": "entry.myMap.img()",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "_location.twig",
+            "line": 14,
+            "call": "entry.myMap.imgSrcSet()",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "partials/variables.twig",
+            "line": 1,
+            "call": "craft.maps.embed()",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "partials/variables.twig",
+            "line": 2,
+            "call": "craft.maps.img()",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "partials/variables.twig",
+            "line": 3,
+            "call": "craft.maps.imgSrcSet()",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "partials/variables.twig",
+            "line": 4,
+            "call": "craft.maps.getLatLngFromAddress()",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "partials/variables.twig",
+            "line": 5,
+            "call": "craft.maps.getUserLocation()",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "partials/variables.twig",
+            "line": 6,
+            "call": "craft.maps.getMapToken()",
+            "badge": "change",
+            "replacement": "Not needed: Rumbo maps need no token"
+        },
+        {
+            "file": "partials/variables.twig",
+            "line": 7,
+            "call": "craft.simpleMap.embed()",
+            "badge": "change",
+            "replacement": "Rename to craft.maps.embed() (Pro), or use Rumbo's own rumbo.map() and rumbo.img()"
+        },
+        {
+            "file": "search.twig",
+            "line": 2,
+            "call": "…myMap({ location, radius, unit, country })",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "search.twig",
+            "line": 7,
+            "call": "orderBy('distance')",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "search.twig",
+            "line": 8,
+            "call": "craft.entries.myMap({ location, radius })",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "search.twig",
+            "line": 8,
+            "call": "orderBy(\"distance asc\")",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "search.twig",
+            "line": 9,
+            "call": "craft.entries.myMap({ location, radius, unit })",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "search.twig",
+            "line": 10,
+            "call": "craft.entries.myMap({ coordinate, radius })",
+            "badge": "pro",
+            "replacement": null
+        },
+        {
+            "file": "search.twig",
+            "line": 12,
+            "call": "store.myMap.distance",
+            "badge": "pro",
+            "replacement": null
+        }
+    ],
+    "summary": {
+        "total": 32,
+        "lite": 15,
+        "pro": 15,
+        "change": 2
+    },
+    "files": 3
+}

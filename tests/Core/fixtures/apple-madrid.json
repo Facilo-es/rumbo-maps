@@ -1,0 +1,39 @@
+{
+  "results": [
+    {
+      "coordinate": {
+        "latitude": 40.4166949,
+        "longitude": -3.7064218
+      },
+      "displayMapRegion": {
+        "southLatitude": 40.416,
+        "westLongitude": -3.707,
+        "northLatitude": 40.4172,
+        "eastLongitude": -3.7058
+      },
+      "name": "Calle Mayor, 1",
+      "formattedAddressLines": [
+        "Calle Mayor, 1",
+        "28013 Madrid",
+        "España"
+      ],
+      "structuredAddress": {
+        "administrativeArea": "Comunidad de Madrid",
+        "administrativeAreaCode": "MD",
+        "subAdministrativeArea": "Madrid",
+        "locality": "Madrid",
+        "postCode": "28013",
+        "subLocality": "Sol",
+        "thoroughfare": "Calle Mayor",
+        "subThoroughfare": "1",
+        "fullThoroughfare": "Calle Mayor, 1",
+        "areasOfInterest": [],
+        "dependentLocalities": [
+          "Sol"
+        ]
+      },
+      "country": "España",
+      "countryCode": "ES"
+    }
+  ]
+}

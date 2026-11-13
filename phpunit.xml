@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+         bootstrap="tests/Core/bootstrap.php"
+         colors="false"
+         cacheDirectory="/tmp/rumbo-phpunit-cache"
+         cacheResult="false"
+         failOnWarning="true"
+         failOnRisky="true"
+         failOnDeprecation="true"
+         failOnPhpunitDeprecation="false"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerWarnings="true">
+    <testsuites>
+        <testsuite name="core">
+            <directory>tests/Core</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src/Core</directory>
+        </include>
+    </source>
+</phpunit>

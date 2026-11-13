@@ -1,0 +1,26 @@
+{# Where people look for you (F12): this month at a glance. #}
+<div class="rumbo-widget" data-rumbo-insights-widget>
+{% if month.searches == 0 %}
+  <p class="light" data-rumbo-insights-empty>{{ 'No searches yet. Add the store locator to a page to start seeing where people look for you.'|t('rumbo-maps') }}</p>
+{% else %}
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px">
+    <div><p style="font-size:24px;font-weight:600;margin:0">{{ month.searches|number }}</p>
+      <p class="light" style="margin:0">{{ 'Searches this month'|t('rumbo-maps') }}{% if month.change is not null %} <span data-rumbo-insights-change style="color:{{ month.change >= 0 ? '#047857' : '#b91c1c' }}">{{ month.change > 0 ? '+' }}{{ month.change }}%</span>{% endif %}</p></div>
+    <div><p style="font-size:24px;font-weight:600;margin:0">{{ (month.searches - month.noResults)|number }}</p>
+      <p class="light" style="margin:0">{{ 'Found something nearby'|t('rumbo-maps') }}</p></div>
+    <div><p style="font-size:24px;font-weight:600;margin:0">{{ month.noResults|number }}</p>
+      <p class="light" style="margin:0">{{ 'Missed demand'|t('rumbo-maps') }}</p></div>
+  </div>
+  {{ map|raw }}
+  <h3 style="margin-top:12px">{{ 'Top searched places'|t('rumbo-maps') }}</h3>
+  <ol data-rumbo-insights-top>{% for p in month.top|slice(0, 10) %}<li>{{ p.placeLabel ?: '—' }} <span class="light">· {{ p.n|number }}</span></li>{% endfor %}</ol>
+  <h3>{{ 'Searched, nothing within {within} {unit}'|t('rumbo-maps', { within: within, unit: unit }) }}</h3>
+  <p class="light" style="margin-top:0">{{ 'Places where people searched and had no location within range. A sign of where customers are waiting.'|t('rumbo-maps') }}</p>
+  {% if month.missed %}
+    <ol data-rumbo-insights-missed>{% for p in month.missed|slice(0, 10) %}<li>{{ p.placeLabel ?: '—' }} <span class="light">· {{ p.n|number }}</span></li>{% endfor %}</ol>
+  {% else %}
+    <p class="light">{{ 'Nobody has come up empty.'|t('rumbo-maps') }}</p>
+  {% endif %}
+{% endif %}
+  <a href="{{ cpUrl('rumbo-maps/insights') }}">{{ 'See all search insights'|t('rumbo-maps') }} →</a>
+</div>

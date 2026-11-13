@@ -1,0 +1,122 @@
+{% import '_includes/forms' as forms %}
+<div class="rumbo-cp rumbo-move">
+  <h2>{{ 'Move from Maps by Ether Creative'|t('rumbo-maps') }}</h2>
+  <p>{{ 'Copy every location and field setting into Rumbo Maps. Your field handles stay the same, so your templates keep working. Keep Maps installed until this is done: uninstalling it deletes its locations.'|t('rumbo-maps') }}</p>
+  <p class="rumbo-move__warning" style="padding:12px 14px;border-radius:6px;background:#fff7e6;border:1px solid #f0c36d">
+    <strong data-rumbo-move-warning>{{ 'Run this while Maps is still installed.'|t('rumbo-maps') }}</strong>
+    {{ 'Uninstalling Maps deletes its table of locations, and after that there is nothing left to copy.'|t('rumbo-maps') }}
+  </p>
+
+{% set pending = fields|filter(f => not f.moved) %}
+{% set moved = fields|filter(f => f.moved and (f.move.status ?? '') == 'done') %}
+
+{% if not oldTable and pending|length %}
+  <p class="error"><strong>{{ 'The Maps table is gone, so these fields have nothing left to copy.'|t('rumbo-maps') }}</strong> {{ 'Restore the database backup from before Maps was uninstalled, run the move, then uninstall Maps.'|t('rumbo-maps') }}</p>
+{% endif %}
+
+{% if not fields %}
+  <p>{{ 'No Maps fields were found on this site. Nothing to move.'|t('rumbo-maps') }}</p>
+{% else %}
+  <table class="data fullwidth">
+    <thead><tr><th>{{ 'Field'|t('rumbo-maps') }}</th><th>{{ 'Used in'|t('rumbo-maps') }}</th><th>{{ 'Locations'|t('rumbo-maps') }}</th><th>{{ 'Settings carried over'|t('rumbo-maps') }}</th><th>{{ 'Status'|t('rumbo-maps') }}</th></tr></thead>
+    <tbody>
+    {% for f in fields %}
+      <tr>
+        <td><strong>{{ f.name }}</strong> <code>{{ f.handle }}</code></td>
+        <td>{{ (f.usedIn ?? [])|join(', ') ?: '—' }}</td>
+        <td>{{ f.locations|number }}{% if f.skipped %} <span class="light">· {{ '{n} empty'|t('rumbo-maps', { n: f.skipped|number }) }}</span>{% endif %}</td>
+        <td>
+          {% if f.moved %}{{ 'Done'|t('rumbo-maps') }}
+          {% elseif f.settings.notCarried ?? false %}{{ 'All but:'|t('rumbo-maps') }} {{ f.settings.notCarried|join('; ') }}
+          {% else %}{{ 'All'|t('rumbo-maps') }}{% endif %}
+        </td>
+        <td>
+          {% if f.moved %}<span class="status green"></span>{{ 'Moved'|t('rumbo-maps') }}{% if f.move.dateUpdated ?? null %} · {{ f.move.dateUpdated|date('short') }}{% endif %}
+          {% elseif f.move and f.move.status in ['running', 'pending'] %}<span class="status orange"></span>{{ 'Moving'|t('rumbo-maps') }} {{ (f.move.report.copied ?? 0)|number }}/{{ f.locations|number }}
+          {% elseif f.move and f.move.status == 'rolledBack' %}<span class="status red"></span>{{ 'Stopped and undone: the counts didn’t match. Your data is unchanged.'|t('rumbo-maps') }}
+          {% elseif f.move and f.move.status == 'failed' %}<span class="status red"></span>{{ 'Not moved'|t('rumbo-maps') }}
+          {% else %}<span class="status"></span>{{ 'Ready to move'|t('rumbo-maps') }}{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  {% if dryRun %}
+    <h2>{{ 'What the move will do'|t('rumbo-maps') }}</h2>
+    {% for handle, r in dryRun %}
+      <p><strong>{{ r.name }}</strong>: {{ '{n} locations move across.'|t('rumbo-maps', { n: r.locations|number }) }}
+      {% if r.skipped.empty or r.skipped['missing-lat-lng'] %}{{ '{n} are empty and stay behind.'|t('rumbo-maps', { n: (r.skipped.empty + r.skipped['missing-lat-lng'])|number }) }}{% endif %}</p>
+      {% if r.notCarried %}<p class="light">{{ 'Settings with no equivalent, kept in the log:'|t('rumbo-maps') }} {{ r.notCarried|join(', ') }}</p>{% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if pending|length and oldTable %}
+  <div class="flex" style="margin-top:20px">
+    <a class="btn" href="#rumbo-templates">{{ 'Check my templates'|t('rumbo-maps') }}</a>
+    <form method="post">{{ csrfInput() }}{{ actionInput('rumbo-maps/move/dry-run') }}{{ redirectInput('utilities/rumbo-move') }}
+      <button class="btn">{{ 'Try it first (nothing changes)'|t('rumbo-maps') }}</button></form>
+    <form method="post">{{ csrfInput() }}{{ actionInput('rumbo-maps/move/start') }}{{ redirectInput('utilities/rumbo-move') }}
+      <button class="btn submit">{{ 'Move my locations'|t('rumbo-maps') }}</button></form>
+  </div>
+  <p class="light">{{ 'The old table is never deleted. A move that doesn’t add up undoes itself.'|t('rumbo-maps') }}</p>
+  {% endif %}
+
+  {% set reports = fields|filter(f => f.move and (f.move.status ?? '') in ['done', 'rolledBack', 'failed']) %}
+  {% if reports|length %}
+    {% set totalCopied = 0 %}{% set totalSkipped = 0 %}
+    {% for f in moved %}
+      {% set totalCopied = totalCopied + (f.move.report.copied ?? 0) %}
+      {% set totalSkipped = totalSkipped + (f.move.report.skipped.empty ?? 0) + (f.move.report.skipped['missing-lat-lng'] ?? 0) %}
+    {% endfor %}
+    <h2 id="rumbo-move-report">{{ 'Move report'|t('rumbo-maps') }}</h2>
+    {% if moved|length %}
+      <p data-rumbo-move-done><strong>{{ 'Done. {fields} fields and {locations} locations moved. Nothing was lost.'|t('rumbo-maps', { fields: moved|length|number, locations: totalCopied|number }) }}</strong>
+      {% if totalSkipped %}{{ '{skipped} empty maps were skipped. See the list below.'|t('rumbo-maps', { skipped: totalSkipped|number }) }}{% endif %}</p>
+    {% endif %}
+    <table class="data fullwidth" data-rumbo-move-report>
+      <thead><tr><th>{{ 'Field'|t('rumbo-maps') }}</th><th>{{ 'Locations copied'|t('rumbo-maps') }}</th><th>{{ 'Skipped: empty map'|t('rumbo-maps') }}</th><th>{{ 'Skipped: latitude or longitude missing'|t('rumbo-maps') }}</th><th>{{ 'Settings not carried over'|t('rumbo-maps') }}</th></tr></thead>
+      <tbody>
+      {% for f in reports %}
+        {% set r = f.move.report %}
+        <tr data-rumbo-report-field="{{ f.handle }}">
+          <td><strong>{{ f.name }}</strong> <code>{{ f.handle }}</code>
+            {% if f.move.status != 'done' %}<br><span class="error">{{ (r.messages ?? [])|last }}</span>{% endif %}</td>
+          <td>{{ (r.copied ?? 0)|number }}{% if f.move.oldCount ?? false %} <span class="light">/ {{ f.move.oldCount|number }}</span>{% endif %}</td>
+          <td>{{ (r.skipped.empty ?? 0)|number }}</td>
+          <td>{{ (r.skipped['missing-lat-lng'] ?? 0)|number }}</td>
+          <td>{{ (r.notCarried ?? [])|join('; ') ?: '—' }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% if moved|length and not pending|length %}
+      <div class="pane" style="margin-top:16px">
+        <h3>{{ 'Next steps'|t('rumbo-maps') }}</h3>
+        <p>{{ '1. Look over your pages. 2. Uninstall Maps. 3. You’re ready for Craft 6.'|t('rumbo-maps') }}</p>
+      </div>
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+  <hr>
+  <h2 id="rumbo-templates">{{ 'What your templates use'|t('rumbo-maps') }}</h2>
+  {% set s = scan.summary ?? scanSummary %}
+  {% if s.total == 0 %}
+    <p>{{ 'None of your templates call the old plugin. Nothing to change.'|t('rumbo-maps') }}</p>
+  {% else %}
+    <p>{{ '{n} lines use Maps. {lite} work in Lite, {pro} need Pro, and {change} need a small change.'|t('rumbo-maps', { n: s.total, lite: s.lite, pro: s.pro, change: s.change }) }}</p>
+    {% if s.pro and not isPro %}
+      <p>{{ 'Your pages use proximity search or map embeds. Rumbo Maps Pro keeps them working.'|t('rumbo-maps') }} <a class="btn submit small" href="{{ cpUrl('plugin-store/rumbo-maps') }}">{{ 'Get Pro, USD 49'|t('rumbo-maps') }}</a></p>
+    {% endif %}
+    <table class="data fullwidth">
+      <thead><tr><th>{{ 'File'|t('rumbo-maps') }}</th><th>{{ 'Line'|t('rumbo-maps') }}</th><th>{{ 'Call'|t('rumbo-maps') }}</th><th></th></tr></thead>
+      <tbody>
+      {% for f in scan.findings %}
+        <tr><td><code>{{ f.file }}</code></td><td>{{ f.line }}</td><td><code>{{ f.call }}</code></td>
+        <td>{% if f.badge == 'lite' %}<span class="status green"></span>{{ 'Works in Lite'|t('rumbo-maps') }}{% elseif f.badge == 'pro' %}<span class="status blue"></span>{{ 'Needs Pro'|t('rumbo-maps') }}{% else %}<span class="status orange"></span>{{ 'Change needed'|t('rumbo-maps') }}{% if f.note ?? false %}: {{ f.note }}{% endif %}{% endif %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</div>

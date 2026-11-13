@@ -1,0 +1,70 @@
+{% import '_includes/forms' as forms %}
+{% if not isPro %}
+  <p class="notice">{{ 'Importing locations is part of Rumbo Maps Pro.'|t('rumbo-maps') }}</p>
+{% else %}
+
+{% if imported %}
+  <div class="readable" style="margin-bottom:24px">
+    <p><span class="status {{ imported.failed ? 'orange' : 'green' }}"></span><strong>{{ 'Last import: {created} entries created, {failed} skipped.'|t('rumbo-maps', { created: imported.created, failed: imported.failed }) }}</strong></p>
+    {% for e in imported.errors %}<p class="light">{{ e }}</p>{% endfor %}
+  </div>
+{% endif %}
+
+<h2>{{ '1. Import a CSV file'|t('rumbo-maps') }}</h2>
+{% if not preview %}
+  <p>{{ 'One row per place. A header row, then columns such as name, address, latitude and longitude. Rows with only an address get their position after the import, in the background.'|t('rumbo-maps') }}</p>
+  {% if not targets %}
+    <p class="warning">{{ 'Add a Rumbo location field to an entry type first. The import creates entries there.'|t('rumbo-maps') }}</p>
+  {% else %}
+  <form method="post" enctype="multipart/form-data">{{ csrfInput() }}{{ actionInput('rumbo-maps/import/upload') }}{{ redirectInput('utilities/rumbo-import') }}
+    <input type="file" name="csv" accept=".csv,text/csv" required>
+    <button class="btn submit">{{ 'Upload and preview'|t('rumbo-maps') }}</button>
+    <p class="light">{{ 'Up to 10 MB. Commas or semicolons both work.'|t('rumbo-maps') }}</p>
+  </form>
+  {% endif %}
+{% else %}
+  <form method="post">{{ csrfInput() }}{{ actionInput('rumbo-maps/import/run') }}{{ redirectInput('utilities/rumbo-import') }}
+    {{ forms.selectField({ label: 'Create entries in'|t('rumbo-maps'), name: 'target', options: targets|map(t => { value: t.value, label: t.label }) }) }}
+    {% set fieldOptions = [{ value: '', label: 'Skip'|t('rumbo-maps') }, { value: 'title', label: 'Title'|t('rumbo-maps') }, { value: 'address', label: 'Address'|t('rumbo-maps') }, { value: 'lat', label: 'Latitude'|t('rumbo-maps') }, { value: 'lng', label: 'Longitude'|t('rumbo-maps') }] %}
+    {% for t in targets %}{% for handle, name in t.fields %}{% if ('field:' ~ handle) not in fieldOptions|column('value') %}{% set fieldOptions = fieldOptions|merge([{ value: 'field:' ~ handle, label: name ~ ' (' ~ t.label|split(' › ')|last ~ ')' }]) %}{% endif %}{% endfor %}{% endfor %}
+    <p><strong>{{ preview.name }}</strong> · {{ '{n} rows. The first 10 are shown.'|t('rumbo-maps', { n: preview.total }) }}</p>
+    <div class="tableview" style="overflow-x:auto">
+    <table class="data fullwidth rumbo-preview">
+      <thead>
+        <tr>{% for h in preview.headers %}<th>{{ h }}</th>{% endfor %}</tr>
+        <tr>{% for h in preview.headers %}<td>{{ forms.select({ name: 'map[' ~ loop.index0 ~ ']', options: fieldOptions, value: preview.guess[loop.index0] ?? '' }) }}</td>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for r in preview.rows %}<tr>{% for c in r %}<td>{{ c }}</td>{% endfor %}</tr>{% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <div class="buttons">
+      <button class="btn submit">{{ 'Import {n} rows'|t('rumbo-maps', { n: preview.total }) }}</button>
+      <button class="btn" type="submit" formaction="" name="action" value="rumbo-maps/import/cancel">{{ 'Choose another file'|t('rumbo-maps') }}</button>
+    </div>
+  </form>
+{% endif %}
+
+<hr>
+<h2>{{ '2. Fill missing coordinates'|t('rumbo-maps') }}</h2>
+<p>{{ '{n} places have an address but no position on the map.'|t('rumbo-maps', { n: missing }) }}{% if pending %} {{ '{n} are being looked up now.'|t('rumbo-maps', { n: pending }) }}{% endif %}</p>
+{% if fill and fill.pending > 0 %}
+  <p class="{{ fill.resumesAt ? 'notice' : (fill.error ? 'warning' : '') }}">
+  {% if fill.resumesAt %}
+    {{ 'Paused until {time}: the free OpenStreetMap lookup allows 2,000 a day for each site. {n} places are still waiting and continue by themselves.'|t('rumbo-maps', { time: fill.resumesAt|datetime('short'), n: fill.pending }) }}
+    {{ 'For more a day, add a key for Mapbox, MapTiler, HERE or Google in the settings, or point Rumbo at your own Nominatim server.'|t('rumbo-maps') }}
+  {% elseif fill.error %}
+    {{ 'The lookup service failed: {error}. Rumbo tries again in 15 minutes.'|t('rumbo-maps', { error: fill.error }) }} <a href="{{ cpUrl('utilities/rumbo-keys') }}">{{ 'Test my map keys'|t('rumbo-maps') }}</a>
+  {% endif %}
+  </p>
+{% elseif fill and fill.pending == 0 and not pending %}
+  <p><span class="status green"></span>{{ 'Every address has a position.'|t('rumbo-maps') }}</p>
+{% endif %}
+{% if provider == 'nominatim' %}
+  <p class="light">{{ 'Lookups use the free OpenStreetMap service: one a second, up to 2,000 a day.'|t('rumbo-maps') }}</p>
+{% endif %}
+<form method="post">{{ csrfInput() }}{{ actionInput('rumbo-maps/import/fill') }}{{ redirectInput('utilities/rumbo-import') }}
+  <button class="btn submit" {{ missing ? '' : 'disabled' }}>{{ 'Fill missing coordinates'|t('rumbo-maps') }}</button>
+</form>
+{% endif %}

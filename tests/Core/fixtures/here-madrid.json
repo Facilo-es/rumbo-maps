@@ -1,0 +1,42 @@
+{
+  "items": [
+    {
+      "title": "Calle Mayor, 1, 28013 Madrid, España",
+      "id": "here:fixture",
+      "resultType": "houseNumber",
+      "houseNumberType": "PA",
+      "address": {
+        "label": "Calle Mayor, 1, 28013 Madrid, España",
+        "countryCode": "ESP",
+        "countryName": "España",
+        "stateCode": "MD",
+        "state": "Comunidad de Madrid",
+        "county": "Madrid",
+        "city": "Madrid",
+        "district": "Sol",
+        "street": "Calle Mayor",
+        "postalCode": "28013",
+        "houseNumber": "1"
+      },
+      "position": {
+        "lat": 40.4166949,
+        "lng": -3.7064218
+      },
+      "access": [
+        {
+          "lat": 40.4166949,
+          "lng": -3.7064218
+        }
+      ],
+      "mapView": {
+        "west": -3.707,
+        "south": 40.416,
+        "east": -3.7058,
+        "north": 40.4172
+      },
+      "scoring": {
+        "queryScore": 1.0
+      }
+    }
+  ]
+}

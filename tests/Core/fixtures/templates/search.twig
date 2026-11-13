@@ -1,0 +1,13 @@
+{% set near = craft.app.request.getQueryParam('q') %}
+{% set stores = craft.entries.section('stores').myMap({
+    location: near,
+    radius: 25,
+    unit: 'km',
+    country: 'ES'
+}).orderBy('distance').all() %}
+{% set byPoint = craft.entries.myMap({ location: { lat: 40.4168, lng: -3.7038 }, radius: 10 }).orderBy("distance asc").all() %}
+{% set byCoordinate = craft.entries.myMap({ location: { coordinate: [40.4168, -3.7038] }, radius: 5, unit: 'mi' }).all() %}
+{% set legacy = craft.entries.myMap({ coordinate: '40.4168,-3.7038', radius: 5 }).all() %}
+{% for store in stores %}
+  <li>{{ store.title }}: {{ store.myMap.distance|number_format(1) }} km</li>
+{% endfor %}

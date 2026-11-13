@@ -1,0 +1,20 @@
+{
+  "name": "rumbo-maps-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "vitest run",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "maplibre-gl": "^5.0.0",
+    "supercluster": "^8.0.1"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,8 @@
+{{ craft.maps.embed({ markers: [entry.myMap], zoom: 12 }) }}
+{{ craft.maps.img({ markers: [entry.myMap], width: 400, height: 200 }) }}
+{{ craft.maps.imgSrcSet({ markers: [entry.myMap] }) }}
+{% set point = craft.maps.getLatLngFromAddress('Puerta del Sol, Madrid') %}
+{% set here = craft.maps.getUserLocation() %}
+{% set token = craft.maps.getMapToken() %}
+{{ craft.simpleMap.embed({ markers: [entry.myMap] }) }}
+{% set rows = craft.entries.orderBy('postDate desc').all() %}

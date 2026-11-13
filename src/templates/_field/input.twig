@@ -1,0 +1,45 @@
+{# The editor app mounts here (F1). Without JavaScript the inputs below still post the value. #}
+{% import '_includes/forms' as forms %}
+<div class="rumbo-field" data-rumbo-field id="{{ name|namespaceInputId }}-rumbo">
+  <script type="application/json" data-rumbo-field-config>{{ config|json_encode|raw }}</script>
+  {# Rendered here, not by JS, so Craft's first snapshot of the form already holds them and opening an entry never makes a draft. #}
+  {% set v = value and not value.isEmpty() ? value : null %}
+  {% set parts = config.value.parts ?? {} %}
+  {% for key in ['lat', 'lng', 'zoom', 'source', 'address'] %}
+    <input type="hidden" name="{{ name }}[{{ key }}]" value="{{ v ? attribute(v, key) : '' }}">
+  {% endfor %}
+  {# What the editor started from, so a hand edit of the parts can rebuild the address line. #}
+  <input type="hidden" name="{{ name }}[original]" value="{{ {address: v.address ?? '', parts: parts}|json_encode }}">
+  {% for part in ['number', 'countryCode'] %}
+    <input type="hidden" name="{{ name }}[parts][{{ part }}]" value="{{ parts[part] ?? '' }}">
+  {% endfor %}
+  <div class="rumbo-field__parts" data-rumbo-parts style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px 12px;margin-top:12px">
+    {% for part, label in {
+      street: 'Street and number',
+      city: 'City',
+      postcode: 'Postcode',
+      county: 'County',
+      state: 'State or region',
+      country: 'Country',
+    } %}
+      {% set inputId = (name ~ '-part-' ~ part)|namespaceInputId %}
+      <div class="rumbo-field__part"{% if part == 'street' %} style="grid-column:1/-1"{% endif %}>
+        <label for="{{ inputId }}" class="light" style="display:block;font-size:12px;margin-bottom:2px">{{ label|t('rumbo-maps') }}</label>
+        <input type="text" class="text fullwidth" id="{{ inputId }}" name="{{ name }}[parts][{{ part }}]" value="{{ parts[part] ?? '' }}" autocomplete="off">
+      </div>
+    {% endfor %}
+    {% if field.serviceRadius %}
+      {% set radiusId = (name ~ '-service-radius')|namespaceInputId %}
+      <div class="rumbo-field__part">
+        <label for="{{ radiusId }}" class="light" style="display:block;font-size:12px;margin-bottom:2px">{{ 'Service radius (km)'|t('rumbo-maps') }}</label>
+        <input type="number" min="0" step="0.1" class="text fullwidth" id="{{ radiusId }}" name="{{ name }}[serviceRadius]" value="{{ v.serviceRadius ?? '' }}" data-rumbo-service-radius>
+        <p class="light" style="font-size:12px;margin:2px 0 0">{{ 'How far you travel to customers from here. Leave empty for none.'|t('rumbo-maps') }}</p>
+      </div>
+    {% endif %}
+  </div>
+  <noscript>
+    {{ forms.textField({ label: 'Address'|t('rumbo-maps'), name: name ~ '[address]', value: value.address ?? '' }) }}
+    {{ forms.textField({ label: 'Latitude'|t('rumbo-maps'), name: name ~ '[lat]', value: value.lat ?? '' }) }}
+    {{ forms.textField({ label: 'Longitude'|t('rumbo-maps'), name: name ~ '[lng]', value: value.lng ?? '' }) }}
+  </noscript>
+</div>

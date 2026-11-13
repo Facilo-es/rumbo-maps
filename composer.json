@@ -1,0 +1,69 @@
+{
+  "name": "facilo/rumbo-maps",
+  "description": "Maps, address search and a store locator for Craft. Moves your Maps locations and templates in one click.",
+  "type": "craft-plugin",
+  "version": "1.0.0",
+  "license": "proprietary",
+  "keywords": [
+    "map",
+    "maps",
+    "store locator",
+    "location",
+    "address",
+    "proximity search",
+    "geocoding",
+    "openstreetmap",
+    "google maps",
+    "mapbox",
+    "distance",
+    "craft 6"
+  ],
+  "support": {
+    "email": "support@facilo.es",
+    "issues": "https://github.com/Facilo-es/rumbo-maps/issues",
+    "docs": "https://github.com/Facilo-es/rumbo-maps/blob/main/docs/README.md",
+    "source": "https://github.com/Facilo-es/rumbo-maps"
+  },
+  "require": {
+    "php": "^8.2",
+    "craftcms/cms": "^5.5.0"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main",
+    "phpstan/phpstan": "^1.12",
+    "phpunit/phpunit": "^11.0",
+    "craftcms/feed-me": "^6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "facilo\\rumbo\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "facilo\\rumbo\\tests\\": "tests/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "craftcms/plugin-installer": true,
+      "yiisoft/yii2-composer": true
+    }
+  },
+  "extra": {
+    "handle": "rumbo-maps",
+    "name": "Rumbo Maps",
+    "developer": "Facilo",
+    "documentationUrl": "https://github.com/Facilo-es/rumbo-maps/blob/main/docs/README.md",
+    "class": "facilo\\rumbo\\Plugin",
+    "changelogUrl": "https://raw.githubusercontent.com/Facilo-es/rumbo-maps/main/CHANGELOG.md"
+  },
+  "scripts": {
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix",
+    "phpstan": "phpstan --memory-limit=1G"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

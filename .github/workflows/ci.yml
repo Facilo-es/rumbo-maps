@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.2', '8.5']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: { php-version: '${{ matrix.php }}' }
+      - run: composer install --no-interaction --prefer-dist
+      - run: vendor/bin/phpunit -c phpunit.xml
+  coding-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: { php-version: '8.2' }
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer check-cs
+      - run: composer phpstan

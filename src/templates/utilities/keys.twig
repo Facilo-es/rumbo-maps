@@ -1,0 +1,100 @@
+{# Utilities → Test my map keys (F8). Each Test button loads that provider's map here, in this browser,
+   and asks the server for an address lookup and a reverse lookup. Results are the provider's own words. #}
+{% set hints = {
+  openfreemap: 'OpenFreeMap needs no key. If the map stays blank, check that your Content-Security-Policy allows tiles.openfreemap.org.'|t('rumbo-maps'),
+  google: 'Turn on the Maps JavaScript API for the browser key, and add this website to the key’s website restrictions.'|t('rumbo-maps'),
+  mapbox: 'Use a public token (it starts with pk.) and add this website to the token’s URL restrictions.'|t('rumbo-maps'),
+  maptiler: 'Add this website to the key’s allowed HTTP origins in MapTiler Cloud.'|t('rumbo-maps'),
+  here: 'Turn on Maps API for JavaScript for this API key in the HERE platform.'|t('rumbo-maps'),
+  apple: 'Check the team ID, key ID and private key, and that the key has MapKit JS enabled.'|t('rumbo-maps'),
+} %}
+{% if pairingWarning %}
+  <p class="error" style="margin:0 0 16px">{{ 'Google only allows its address results on Google maps. Your pages will use Google maps while Google is your address search provider.'|t('rumbo-maps') }}</p>
+{% endif %}
+<p class="light" style="margin:0 0 16px">{{ 'Each test loads the map in this browser, looks up a test address, and finds the address at a test point. If something fails, you see the provider’s own message and what to turn on.'|t('rumbo-maps') }}</p>
+<table class="data fullwidth" id="rumbo-keytest" data-map-module="{{ mapModuleUrl }}" data-map-css="{{ mapCssUrl }}" data-lang="{{ craft.app.language }}">
+  <thead><tr>
+    <th>{{ 'Provider'|t('rumbo-maps') }}</th>
+    <th>{{ 'Map'|t('rumbo-maps') }}</th>
+    <th>{{ 'Address lookup'|t('rumbo-maps') }}</th>
+    <th>{{ 'Reverse lookup'|t('rumbo-maps') }}</th>
+    <th></th>
+  </tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr data-provider="{{ r.name }}" data-hint="{{ hints[r.name] }}">
+      <td>
+        <strong>{{ r.name == 'openfreemap' ? 'OpenStreetMap (free, no key)'|t('rumbo-maps') : r.label }}</strong>
+        {% if r.maps %}<br><span class="light">{{ 'Your maps'|t('rumbo-maps') }}</span>{% endif %}
+        {% if r.lookups %}<br><span class="light">{{ 'Your address search'|t('rumbo-maps') }}</span>{% endif %}
+        {% if not r.configured %}<br><span class="light">{{ 'No key yet'|t('rumbo-maps') }}</span>{% endif %}
+      </td>
+      <td data-part="map"></td>
+      <td data-part="lookup"></td>
+      <td data-part="reverse"></td>
+      <td class="thin"><button type="button" class="btn small" data-test {{ r.configured and (isPro or r.name == 'openfreemap') ? '' : 'disabled' }}>{{ 'Test'|t('rumbo-maps') }}</button></td>
+    </tr>
+    <tr class="rumbo-keytest-maprow" hidden><td colspan="5"><div class="rumbo-mapbox" style="height:220px;max-width:520px"></div></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if not isPro %}<p class="light" style="margin-top:12px">{{ 'Other providers are part of Rumbo Maps Pro.'|t('rumbo-maps') }}</p>{% endif %}
+
+{% js %}
+(function () {
+  var table = document.getElementById('rumbo-keytest');
+  if (!table) return;
+  var T = {
+    working: {{ 'Working'|t('rumbo-maps')|json_encode|raw }},
+    testing: {{ 'Testing…'|t('rumbo-maps')|json_encode|raw }},
+    timeout: {{ 'The map did not finish loading within 15 seconds.'|t('rumbo-maps')|json_encode|raw }}
+  };
+  var mod = null;
+  function load() {
+    if (!mod) {
+      if (!document.querySelector('link[href="' + table.dataset.mapCss + '"]')) {
+        var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = table.dataset.mapCss; document.head.appendChild(l);
+      }
+      mod = import(table.dataset.mapModule);
+    }
+    return mod;
+  }
+  function show(td, ok, msg, hint, ms) {
+    td.textContent = '';
+    var s = document.createElement('span'); s.className = 'status ' + (ok ? 'green' : 'red'); td.appendChild(s);
+    var b = document.createElement(ok ? 'span' : 'strong'); b.textContent = ok ? T.working : msg; td.appendChild(b);
+    if (ok && msg) { var d = document.createElement('div'); d.className = 'light'; d.textContent = msg + (ms != null ? ' (' + ms + ' ms)' : ''); td.appendChild(d); }
+    if (!ok && hint) { var h = document.createElement('div'); h.className = 'light'; h.textContent = hint; td.appendChild(h); }
+  }
+  function testMap(tr, cfg) {
+    var td = tr.querySelector('[data-part=map]');
+    var row = tr.nextElementSibling; var box = row.querySelector('.rumbo-mapbox');
+    row.hidden = false; box.innerHTML = '';
+    return load().then(function (m) {
+      var errors = [];
+      var ctl = m.mountMap(box, { provider: cfg, lang: table.dataset.lang, center: [-3.7035, 40.4169], zoom: 14, markers: [{ lat: 40.4169, lng: -3.7035, title: 'Puerta del Sol' }], popups: false });
+      ctl.on('error', function (e) { errors.push(e); });
+      var t = new Promise(function (_, rej) { setTimeout(function () { rej(new Error(T.timeout)); }, 15000); });
+      return Promise.race([ctl.loaded, t]).then(function () { show(td, true, ''); },
+        function (e) { show(td, false, errors[0] || (e && e.message) || String(e), tr.dataset.hint); });
+    }, function (e) { show(td, false, e && e.message ? e.message : String(e), tr.dataset.hint); });
+  }
+  table.addEventListener('click', function (ev) {
+    var btn = ev.target.closest('[data-test]');
+    if (!btn) return;
+    var tr = btn.closest('tr');
+    ['map', 'lookup', 'reverse'].forEach(function (p) { tr.querySelector('[data-part=' + p + ']').textContent = T.testing; });
+    btn.disabled = true;
+    Craft.sendActionRequest('POST', 'rumbo-maps/keys/test', { data: { provider: tr.dataset.provider } }).then(function (r) {
+      var d = r.data;
+      show(tr.querySelector('[data-part=lookup]'), d.lookup.ok, d.lookup.message, '', d.lookup.ms);
+      show(tr.querySelector('[data-part=reverse]'), d.reverse.ok, d.reverse.message, '', d.reverse.ms);
+      if (!d.map) { show(tr.querySelector('[data-part=map]'), false, d.mapMissing, ''); return; }
+      return testMap(tr, d.map);
+    }).catch(function (e) {
+      var msg = (e && e.response && e.response.data && e.response.data.message) || (e && e.message) || String(e);
+      ['map', 'lookup', 'reverse'].forEach(function (p) { show(tr.querySelector('[data-part=' + p + ']'), false, msg, ''); });
+    }).then(function () { btn.disabled = false; });
+  });
+})();
+{% endjs %}

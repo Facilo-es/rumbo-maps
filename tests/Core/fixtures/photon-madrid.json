@@ -1,0 +1,48 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.7064218,
+          40.4166949
+        ]
+      },
+      "properties": {
+        "osm_type": "N",
+        "osm_id": 1,
+        "osm_key": "place",
+        "osm_value": "house",
+        "type": "house",
+        "housenumber": "1",
+        "street": "Calle Mayor",
+        "district": "Sol",
+        "city": "Madrid",
+        "postcode": "28013",
+        "state": "Comunidad de Madrid",
+        "country": "España",
+        "countrycode": "ES"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -9.1393,
+          38.7223
+        ]
+      },
+      "properties": {
+        "osm_key": "highway",
+        "type": "street",
+        "name": "Rua Mayor",
+        "city": "Lisboa",
+        "country": "Portugal",
+        "countrycode": "PT"
+      }
+    }
+  ]
+}

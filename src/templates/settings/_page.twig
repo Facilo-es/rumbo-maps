@@ -1,0 +1,8 @@
+{#- Plugin settings page with tabs: each pane in settings/index.twig is a tab. -#}
+{% extends 'settings/plugins/_settings' %}
+{% set tabs = {
+  maps: { label: 'Maps and search'|t('rumbo-maps'), url: '#settings-maps' },
+  locator: { label: 'Locator'|t('rumbo-maps'), url: '#settings-locator' },
+  privacy: { label: 'Privacy'|t('rumbo-maps'), url: '#settings-privacy' },
+  visitors: { label: 'Visitor location'|t('rumbo-maps'), url: '#settings-visitors' },
+} %}

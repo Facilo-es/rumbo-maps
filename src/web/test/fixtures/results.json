@@ -1,0 +1,6 @@
+{"ok":true,"total":3,"unit":"km","within":25,"origin":{"label":"Madrid","lat":40.4168,"lng":-3.7038},"nearest":null,
+ "results":[
+  {"id":1,"lat":40.4262,"lng":-3.7055,"title":"Grano Malasaña","address":"Calle del Pez 12, 28004 Madrid","distance":1.24,"url":"/cafes/malasana","directionsUrl":"https://www.openstreetmap.org/directions?route=%3B40.4262%2C-3.7055","fields":{"hours":"Open until 20:00","wifi":"Wi-Fi"}},
+  {"id":2,"lat":40.4114,"lng":-3.6945,"title":"Grano Huertas","address":"Calle de las Huertas 40, 28014 Madrid","distance":3.08,"url":"/cafes/huertas"},
+  {"id":3,"lat":40.4531,"lng":-3.6883,"title":"Grano Chamartín","address":"Calle de Alberto Alcocer 5, 28036 Madrid","distance":12.6}
+ ]}

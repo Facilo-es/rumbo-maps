@@ -1,0 +1,64 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "fixture",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -3.7064218,
+          40.4166949
+        ]
+      },
+      "properties": {
+        "mapbox_id": "fixture",
+        "feature_type": "address",
+        "full_address": "Calle Mayor 1, 28013 Madrid, España",
+        "name": "Calle Mayor 1",
+        "place_formatted": "28013 Madrid, España",
+        "coordinates": {
+          "longitude": -3.7064218,
+          "latitude": 40.4166949,
+          "accuracy": "rooftop"
+        },
+        "context": {
+          "address": {
+            "mapbox_id": "a",
+            "address_number": "1",
+            "street_name": "Calle Mayor",
+            "name": "Calle Mayor 1"
+          },
+          "street": {
+            "mapbox_id": "s",
+            "name": "Calle Mayor"
+          },
+          "postcode": {
+            "mapbox_id": "p",
+            "name": "28013"
+          },
+          "locality": {
+            "mapbox_id": "l",
+            "name": "Centro"
+          },
+          "place": {
+            "mapbox_id": "pl",
+            "name": "Madrid"
+          },
+          "region": {
+            "mapbox_id": "r",
+            "name": "Comunidad de Madrid",
+            "region_code": "MD"
+          },
+          "country": {
+            "mapbox_id": "c",
+            "name": "España",
+            "country_code": "ES",
+            "country_code_alpha_3": "ESP"
+          }
+        }
+      }
+    }
+  ],
+  "attribution": "© 2026 Mapbox and its suppliers."
+}

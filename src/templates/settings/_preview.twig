@@ -1,0 +1,21 @@
+{#- Settings → Locator live preview: a bare page with the real locator and example locations. The settings page sets colours and corners on it directly. -#}
+{%- do view.registerAssetBundle('facilo\\rumbo\\Craft\\web\\FrontAsset') -%}
+{%- set body -%}
+{% include 'rumbo-maps/_locator/locator' %}
+{%- endset -%}
+<!DOCTYPE html>
+<html lang="{{ craft.app.language }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>{{ 'Live preview'|t('rumbo-maps') }}</title>
+<style>body{margin:0;padding:24px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#fff}@media (max-width:600px){body{padding:14px}}</style>
+{{ head() }}
+</head>
+<body>
+{{ beginBody() }}
+{{ body }}
+{{ endBody() }}
+</body>
+</html>

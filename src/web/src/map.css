@@ -1,0 +1,48 @@
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+/* Markers: design A green pins. Numbered circles in the locator, a pin on single maps. */
+.rumbo-pin{display:grid;place-items:center;padding:0;border:0;background:none;color:var(--rumbo-marker,#17694f);cursor:pointer;line-height:1}
+.rumbo-pin svg{width:28px;height:36px;display:block;filter:drop-shadow(0 2px 3px rgba(20,32,27,.3))}
+.rumbo-pin.is-active svg{width:36px;height:46px}
+.rumbo-pin--n{width:26px;height:26px;border-radius:50%;border:2.5px solid #fff;background:var(--rumbo-marker,#17694f);color:var(--rumbo-marker-ink,#fff);font:600 11px/1 var(--rumbo-font,system-ui),sans-serif;font-variant-numeric:tabular-nums;box-shadow:0 2px 6px rgba(20,32,27,.3);transition:width .12s,height .12s}
+.rumbo-pin--n.is-active{width:36px;height:36px;font-size:14px;box-shadow:0 0 0 6px rgba(23,105,79,.18),0 4px 10px rgba(20,32,27,.35)}
+.rumbo-pin--img img{width:32px;height:32px;object-fit:contain;display:block}
+.rumbo-pin:focus-visible,.rumbo-cluster:focus-visible{outline:3px solid var(--rumbo-ink,#14201b);outline-offset:2px}
+/* Invisible 44px tap target around small markers */
+.rumbo-pin::after,.rumbo-cluster::after{content:"";position:absolute;inset:-10px}
+.rumbo-pin,.rumbo-cluster{position:relative}
+/* MapLibre places its markers absolutely; the rule above must not pull them back into the flow. */
+.maplibregl-marker.rumbo-pin,.maplibregl-marker.rumbo-cluster{position:absolute}
+.rumbo-cluster{display:grid;place-items:center;width:36px;height:36px;padding:0;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:var(--rumbo-marker,#17694f);color:var(--rumbo-marker-ink,#fff);font:700 13px/1 var(--rumbo-font,system-ui),sans-serif;box-shadow:0 0 0 5px rgba(23,105,79,.2),0 2px 6px rgba(20,32,27,.3);cursor:pointer}
+.rumbo-cluster--m{width:44px;height:44px}
+.rumbo-cluster--l{width:54px;height:54px;font-size:14px}
+.rumbo-you{width:14px;height:14px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 8px rgba(37,99,235,.16)}
+
+/* Controls and attribution in design A's quiet style. Attribution is never hidden. */
+.rumbo-map .maplibregl-ctrl-group,.rumbo-mapbox .maplibregl-ctrl-group{border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.rumbo-map .maplibregl-ctrl-top-right,.rumbo-mapbox .maplibregl-ctrl-top-right{top:6px;right:6px}
+.maplibregl-ctrl-attrib{display:block!important;visibility:visible!important;opacity:1!important}
+.rumbo-map .maplibregl-ctrl-attrib,.rumbo-mapbox .maplibregl-ctrl-attrib{background:rgba(255,255,255,.85);font-size:10.5px;color:#555}
+.rumbo-map .maplibregl-ctrl-attrib a,.rumbo-mapbox .maplibregl-ctrl-attrib a{color:#3d4743}
+
+/* Popups */
+.rumbo-pop{display:grid;gap:3px;font:14px/1.45 var(--rumbo-font,system-ui),sans-serif;color:var(--rumbo-ink,#14201b);padding:2px 4px}
+.rumbo-pop__t{font-size:15px;font-weight:600}
+.rumbo-pop__t a{color:inherit}
+.rumbo-pop__a{color:var(--rumbo-muted,#5f6b66)}
+.rumbo-pop__dir{color:var(--rumbo-accent,#17694f);font-weight:600;text-decoration:none;min-height:32px;display:inline-flex;align-items:center}
+.maplibregl-popup-content{border-radius:12px;padding:12px 14px;box-shadow:0 6px 24px rgba(20,32,27,.18)}
+.maplibregl-popup-close-button{width:32px;height:32px;font-size:20px}
+/* The locator's .rumbo button{color:inherit} outranks the single-class rules above. */
+.rumbo .rumbo-pin.rumbo-pin--n,.rumbo .rumbo-cluster{color:#fff}
+
+/* Provider-neutral marker anchoring (Google, Apple anchor at bottom-centre; HERE at top-left) */
+.rumbo-at{line-height:0}
+.rumbo-at--c{transform:translateY(50%)}
+.rumbo-here{position:absolute;line-height:0}
+.rumbo-here--b{transform:translate(-50%,-100%)}
+.rumbo-here--c{transform:translate(-50%,-50%)}
+.rumbo-callout{background:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 6px 24px rgba(20,32,27,.18);max-width:280px;font:inherit}
+.rumbo-failed .rumbo-map__canvas{display:none}
+/* Insights dots are drawn at their own 14px size so nearby cities stay apart. */
+.rumbo-insights-map .rumbo-pin--img img{width:14px;height:14px}

@@ -1,0 +1,74 @@
+{
+  "results": [
+    {
+      "address_components": [
+        {
+          "long_name": "1",
+          "short_name": "1",
+          "types": [
+            "street_number"
+          ]
+        },
+        {
+          "long_name": "Calle Mayor",
+          "short_name": "C. Mayor",
+          "types": [
+            "route"
+          ]
+        },
+        {
+          "long_name": "Madrid",
+          "short_name": "Madrid",
+          "types": [
+            "locality",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Madrid",
+          "short_name": "M",
+          "types": [
+            "administrative_area_level_2",
+            "political"
+          ]
+        },
+        {
+          "long_name": "Comunidad de Madrid",
+          "short_name": "MD",
+          "types": [
+            "administrative_area_level_1",
+            "political"
+          ]
+        },
+        {
+          "long_name": "España",
+          "short_name": "ES",
+          "types": [
+            "country",
+            "political"
+          ]
+        },
+        {
+          "long_name": "28013",
+          "short_name": "28013",
+          "types": [
+            "postal_code"
+          ]
+        }
+      ],
+      "formatted_address": "C. Mayor, 1, Centro, 28013 Madrid, España",
+      "geometry": {
+        "location": {
+          "lat": 40.4166949,
+          "lng": -3.7064218
+        },
+        "location_type": "ROOFTOP"
+      },
+      "place_id": "fixture",
+      "types": [
+        "street_address"
+      ]
+    }
+  ],
+  "status": "OK"
+}

@@ -1,0 +1,50 @@
+{#
+  Rumbo Maps: one map with one or more markers. Lazy-loaded by rumbo-loader.js when it nears the screen.
+  Without JavaScript (or before consent) it shows the places as a list with links to OpenStreetMap.
+  Variables: id, config ({style, center:[lng,lat], zoom, markers:[{id,lat,lng,title,address,url,directionsUrl}], cluster, fitBounds,
+  scrollZoom, markerColor}), height (px), consentRequired, staticUrl, attributionNote, provider, corners, fontInherit.
+#}
+{%- set id = id ?? ('rumbo-map-' ~ random(100000, 999999)) -%}
+{%- set config = config ?? {} -%}
+{%- set markers = config.markers ?? [] -%}
+{%- set consentRequired = consentRequired ?? false -%}
+{%- set staticUrl = staticUrl ?? null -%}
+{%- set provider = provider ?? 'OpenFreeMap' -%}
+{%- set height = (height ?? config.height ?? 400)|integer -%}
+{%- set jsConfig = config|merge({
+  lang: config.lang ?? craft.app.language,
+  strings: {cluster: '{n} locations, zoom in'|t('rumbo-maps'), directions: 'Directions'|t('rumbo-maps')}|merge(config.strings ?? {}),
+}) -%}
+{%- set classes = ['rumbo-mapbox']
+  |merge((corners ?? 'round') == 'square' ? ['rumbo--square'] : [])
+  |merge((fontInherit ?? false) ? ['rumbo--font-inherit'] : []) -%}
+<div id="{{ id }}" class="{{ classes|join(' ') }}" data-rumbo-map data-rumbo-height="{{ height }}" role="region" aria-label="{{ (markers|length == 1 ? markers[0].title ?? 'Map'|t('rumbo-maps') : 'Map'|t('rumbo-maps')) }}"
+  {%- if consentRequired %} data-rumbo-consent="required" data-rumbo-provider="{{ provider }}"{% endif %}
+  {%- if staticUrl %} data-rumbo-static="{{ staticUrl }}"{% endif %}>
+  <script type="application/json" data-rumbo-config>{{ jsConfig|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
+  <div class="rumbo-map__fallback">
+    {%- if staticUrl %}<img class="rumbo-map__static" src="{{ staticUrl }}" alt="" loading="lazy">{% endif %}
+    {%- if markers|length %}
+    <ul>
+      {%- for m in markers|slice(0, 50) %}
+      <li>
+        <strong>{% if m.url ?? false %}<a href="{{ m.url }}">{{ m.title ?? '' }}</a>{% else %}{{ m.title ?? '' }}{% endif %}</strong>
+        {%- if m.address ?? false %}{{ m.address }}<br>{% endif %}
+        <a href="https://www.openstreetmap.org/?mlat={{ m.lat }}&amp;mlon={{ m.lng }}#map=16/{{ m.lat }}/{{ m.lng }}" target="_blank" rel="noopener">{{ 'View on OpenStreetMap'|t('rumbo-maps') }}</a>
+      </li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+    {%- if attributionNote ?? false %}<p class="rumbo-map__note">{{ attributionNote }}</p>{% endif %}
+  </div>
+  {%- if consentRequired %}
+  <div class="rumbo-consent" data-rumbo-placeholder hidden>
+    {%- if staticUrl %}<img class="rumbo-consent__img" src="{{ staticUrl }}" alt="">{% endif %}
+    <div class="rumbo-consent__box">
+      <p>{{ 'This map is provided by {provider}. Loading it sends your IP address to them.'|t('rumbo-maps', {provider: provider}) }}</p>
+      <button type="button" class="rumbo-btn" data-rumbo-show>{{ 'Show map'|t('rumbo-maps') }}</button>
+      <button type="button" class="rumbo-link" data-rumbo-always>{{ 'Always show maps on this site'|t('rumbo-maps') }}</button>
+    </div>
+  </div>
+  {%- endif %}
+</div>

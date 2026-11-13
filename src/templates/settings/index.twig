@@ -1,0 +1,76 @@
+{% import '_includes/forms' as forms %}
+<div id="maps">
+<h2>{{ 'Maps and address search'|t('rumbo-maps') }}</h2>
+{% set providerNames = { openfreemap: 'OpenFreeMap (free, no key)'|t('rumbo-maps'), google: 'Google', mapbox: 'Mapbox', maptiler: 'MapTiler', here: 'HERE', apple: 'Apple' } %}
+{% set geocoderNames = providerNames|merge({ nominatim: 'OpenStreetMap (free, no key)'|t('rumbo-maps') }) %}
+{{ forms.selectField({ label: 'Map provider'|t('rumbo-maps'), id: 'rumbo-mapProvider', name: 'mapProvider', value: settings.mapProvider, options: ['openfreemap','google','mapbox','maptiler','here','apple']|map(v => { label: providerNames[v], value: v }), disabled: not isPro, instructions: not isPro ? 'Other providers are part of Rumbo Maps Pro.'|t('rumbo-maps') : null }) }}
+{{ forms.selectField({ label: 'Map style'|t('rumbo-maps'), name: 'mapStyle', value: settings.mapStyle, options: ['positron','liberty','bright','dark']|map(v => { label: v|capitalize, value: v }) }) }}
+{{ forms.selectField({ label: 'Address search provider'|t('rumbo-maps'), id: 'rumbo-geocoder', name: 'geocoder', value: settings.geocoder, options: ['nominatim','google','mapbox','maptiler','here','apple']|map(v => { label: geocoderNames[v], value: v }), disabled: not isPro, instructions: 'Free and needs no key. Fine for adding locations and for sites with moderate traffic. For many searches a day, add a key from another provider or your own Nominatim server.'|t('rumbo-maps') }) }}
+<p class="error" id="rumbo-pairing" {{ settings.pairingWarning() ? '' : 'hidden' }}>{{ 'Google only allows its address results on Google maps. Your pages will use Google maps while Google is your address search provider.'|t('rumbo-maps') }}</p>
+{{ forms.autosuggestField({ label: 'Your own Nominatim server (optional)'|t('rumbo-maps'), instructions: 'For lookups. You can use an environment variable, such as $NOMINATIM_URL.'|t('rumbo-maps'), name: 'nominatimUrl', value: settings.nominatimUrl, suggestEnvVars: true, placeholder: 'https://nominatim.example.com', errors: settings.getErrors('nominatimUrl') }) }}
+{{ forms.autosuggestField({ label: 'Your own Photon server (optional)'|t('rumbo-maps'), instructions: 'For the suggestions shown while editors type an address. You can use an environment variable, such as $PHOTON_URL.'|t('rumbo-maps'), name: 'photonUrl', value: settings.photonUrl, suggestEnvVars: true, placeholder: 'https://photon.example.com', errors: settings.getErrors('photonUrl') }) }}
+{% set envHelp = 'You can use an environment variable, such as {v}.'|t('rumbo-maps') %}
+{% for p in ['google','mapbox','maptiler','here','apple'] %}
+  <fieldset class="rumbo-keys" data-provider="{{ p }}" style="border:1px solid var(--hairline-color, #e3e5e8);border-radius:8px;padding:12px 16px 4px;margin:0 0 16px">
+    <legend class="h6" style="padding:0 6px">{{ providerNames[p] }}</legend>
+    {% if p == 'apple' %}
+      {{ forms.autosuggestField({ label: 'Team ID'|t('rumbo-maps'), name: 'keys[apple][teamId]', value: settings.keys.apple.teamId ?? '', suggestEnvVars: true, disabled: not isPro, instructions: envHelp|replace({ '{v}': '$APPLE_TEAM_ID' }) }) }}
+      {{ forms.autosuggestField({ label: 'Key ID'|t('rumbo-maps'), name: 'keys[apple][keyId]', value: settings.keys.apple.keyId ?? '', suggestEnvVars: true, disabled: not isPro, instructions: envHelp|replace({ '{v}': '$APPLE_MAPS_KEY_ID' }) }) }}
+      {{ forms.autosuggestField({ label: 'Private key'|t('rumbo-maps'), name: 'keys[apple][privateKey]', value: settings.keys.apple.privateKey ?? '', suggestEnvVars: true, disabled: not isPro, placeholder: '$APPLE_MAPS_PRIVATE_KEY', instructions: 'Use an environment variable holding the contents of the .p8 file, such as $APPLE_MAPS_PRIVATE_KEY. It stays on your server: pages get a short-lived token instead.'|t('rumbo-maps') }) }}
+    {% else %}
+      {% set up = p|upper %}
+      {{ forms.autosuggestField({ label: 'Browser key (used on your pages)'|t('rumbo-maps'), name: 'keys[' ~ p ~ '][browser]', value: settings.keys[p].browser ?? '', suggestEnvVars: true, disabled: not isPro, instructions: envHelp|replace({ '{v}': '$' ~ up ~ '_MAPS_BROWSER_KEY' }) }) }}
+      {{ forms.autosuggestField({ label: 'Server key (used for address lookups)'|t('rumbo-maps'), name: 'keys[' ~ p ~ '][server]', value: settings.keys[p].server ?? '', suggestEnvVars: true, disabled: not isPro, instructions: envHelp|replace({ '{v}': '$' ~ up ~ '_MAPS_SERVER_KEY' }) }) }}
+      {% if p == 'google' %}
+        {{ forms.autosuggestField({ label: 'Map ID'|t('rumbo-maps'), name: 'keys[google][mapId]', value: settings.keys.google.mapId ?? '', suggestEnvVars: true, disabled: not isPro, instructions: 'From Map management in the Google Cloud console. It sets the map’s look and is needed for modern markers.'|t('rumbo-maps') }) }}
+        {{ forms.autosuggestField({ label: 'URL signing secret (optional)'|t('rumbo-maps'), name: 'keys[google][secret]', value: settings.keys.google.secret ?? '', suggestEnvVars: true, disabled: not isPro, instructions: 'Signs static map images so nobody else can use your key for them. '|t('rumbo-maps') ~ envHelp|replace({ '{v}': '$GOOGLE_MAPS_SIGNING_SECRET' }) }) }}
+      {% endif %}
+    {% endif %}
+  </fieldset>
+{% endfor %}
+<p><a class="btn" href="{{ url('utilities/rumbo-keys') }}">{{ 'Test my keys'|t('rumbo-maps') }}</a></p>
+{% js %}
+(function () {
+  var mp = document.getElementById('{{ 'rumbo-mapProvider'|namespaceInputId }}'), gc = document.getElementById('{{ 'rumbo-geocoder'|namespaceInputId }}'), w = document.getElementById('{{ 'rumbo-pairing'|namespaceInputId }}');
+  if (!mp || !gc || !w) return;
+  function upd() { w.hidden = !(gc.value === 'google' && mp.value !== 'google'); }
+  mp.addEventListener('change', upd); gc.addEventListener('change', upd);
+})();
+{% endjs %}
+
+<hr><h2>{{ 'Craft addresses'|t('rumbo-maps') }}{% if not isPro %} <span class="light">· Pro</span>{% endif %}</h2>
+{{ forms.lightswitchField({ label: 'Find the position of Craft’s own addresses'|t('rumbo-maps'), instructions: 'When a user, store or order address is saved, a background job adds its latitude and longitude, so it can go on maps and in nearest searches with rumbo.addresses().'|t('rumbo-maps'), name: 'geocodeAddresses', on: settings.geocodeAddresses }) }}
+</div>
+
+<div id="locator" class="hidden">
+{% include 'rumbo-maps/settings/_locator' %}
+</div>
+
+<div id="privacy" class="hidden">
+<h2>{{ 'Privacy'|t('rumbo-maps') }}</h2>
+{{ forms.lightswitchField({ label: 'Load maps only after the visitor agrees'|t('rumbo-maps'), instructions: 'Map providers receive your visitor\'s IP address when a map loads. Turn this on if your cookie banner asks for consent before loading outside content.'|t('rumbo-maps'), name: 'consentRequired', on: settings.consentRequired }) }}
+{{ forms.lightswitchField({ label: 'Collect search insights'|t('rumbo-maps'), instructions: 'Keeps only the town or postcode searched, for 13 months.'|t('rumbo-maps'), name: 'collectInsights', on: settings.collectInsights }) }}
+</div>
+
+<div id="visitors" class="hidden">
+<h2>{{ 'Visitor location'|t('rumbo-maps') }}{% if not isPro %} <span class="light">· Pro</span>{% endif %}</h2>
+{{ forms.autosuggestField({ label: 'GeoLite2 City database'|t('rumbo-maps'), instructions: 'Path to the GeoLite2-City.mmdb file you download free from MaxMind. Visitor positions are read on your server, and no data leaves it.'|t('rumbo-maps'), name: 'geoLiteDb', value: settings.geoLiteDb, suggestEnvVars: true, suggestAliases: true, placeholder: '@storage/geoip/GeoLite2-City.mmdb' }) }}
+{{ forms.editableTableField({
+  label: 'Send visitors to the right site'|t('rumbo-maps'),
+  instructions: 'Once a visit, people from a country, or within a distance of a point, go to a site (its handle) or a URL. Never search engines or other bots, and never the control panel.'|t('rumbo-maps'),
+  id: 'rumbo-redirects',
+  name: 'redirects',
+  allowAdd: true, allowDelete: true, allowReorder: true,
+  addRowLabel: 'Add a rule'|t('rumbo-maps'),
+  cols: {
+    type: { heading: 'When the visitor is'|t('rumbo-maps'), type: 'select', options: [{ label: 'From a country'|t('rumbo-maps'), value: 'country' }, { label: 'Near a point'|t('rumbo-maps'), value: 'distance' }] },
+    country: { heading: 'Country code'|t('rumbo-maps'), type: 'singleline', placeholder: 'PT', width: 80 },
+    lat: { heading: 'Latitude'|t('rumbo-maps'), type: 'singleline', width: 90 },
+    lng: { heading: 'Longitude'|t('rumbo-maps'), type: 'singleline', width: 90 },
+    within: { heading: 'Within (km)'|t('rumbo-maps'), type: 'number', width: 80 },
+    target: { heading: 'Go to (site handle or URL)'|t('rumbo-maps'), type: 'singleline', placeholder: 'portugal' },
+  },
+  rows: settings.redirects,
+}) }}
+
+</div>

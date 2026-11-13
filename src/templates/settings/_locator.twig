@@ -1,0 +1,174 @@
+{#- Settings, Locator tab: the look, colours and numbers on the left, a live preview with example locations on the right (F6, design C). -#}
+{% import '_includes/forms' as forms %}
+{%- set looks = [
+  { value: 'side', label: 'Side by side'|t('rumbo-maps'), svg: '<rect x="4" y="4" width="40" height="68" rx="3" fill="#fff"/><rect x="8" y="9" width="32" height="6" rx="2" fill="#dfe5e1"/><rect x="8" y="21" width="28" height="3" rx="1.5" fill="#c3ccc7"/><rect x="8" y="30" width="24" height="3" rx="1.5" fill="#c3ccc7"/><rect x="8" y="39" width="28" height="3" rx="1.5" fill="#c3ccc7"/><rect x="8" y="48" width="22" height="3" rx="1.5" fill="#c3ccc7"/><rect x="48" y="4" width="68" height="68" rx="4" fill="#e8ebe6"/><path d="M60 4l10 68M48 40l68-10M96 4l-6 68" stroke="#fff" stroke-width="2.5"/><circle class="rumbo-look-dot" cx="72" cy="30" r="3.5"/><circle class="rumbo-look-dot" cx="92" cy="48" r="3.5"/><circle class="rumbo-look-dot" cx="64" cy="54" r="3.5"/>' },
+  { value: 'mapFirst', label: 'Map first'|t('rumbo-maps'), svg: '<rect x="4" y="4" width="112" height="7" rx="2" fill="#fff"/><rect x="4" y="14" width="112" height="32" rx="4" fill="#e8ebe6"/><path d="M30 14l8 32M4 34l112-8M86 14l-6 32" stroke="#fff" stroke-width="2.5"/><circle class="rumbo-look-dot" cx="50" cy="28" r="3.5"/><circle class="rumbo-look-dot" cx="76" cy="36" r="3.5"/><rect x="4" y="50" width="35" height="22" rx="3" fill="#fff"/><rect x="42.5" y="50" width="35" height="22" rx="3" fill="#fff"/><rect x="81" y="50" width="35" height="22" rx="3" fill="#fff"/>' },
+  { value: 'list', label: 'List only (no map)'|t('rumbo-maps'), svg: '<rect x="22" y="4" width="76" height="9" rx="2.5" fill="#fff"/><rect x="22" y="17" width="76" height="16" rx="3" fill="#fff"/><rect x="22" y="36" width="76" height="16" rx="3" fill="#fff"/><rect x="22" y="55" width="76" height="16" rx="3" fill="#fff"/><rect x="27" y="22" width="38" height="3" rx="1.5" fill="#c3ccc7"/><rect x="27" y="41" width="32" height="3" rx="1.5" fill="#c3ccc7"/><rect x="27" y="60" width="36" height="3" rx="1.5" fill="#c3ccc7"/>' },
+] -%}
+<div class="rumbo-set">
+  <div class="rumbo-set__form">
+    <h2>{{ 'Store locator look'|t('rumbo-maps') }}{% if not isPro %} <span class="light">· Pro</span>{% endif %}</h2>
+    {% if not isPro %}<p class="light">{{ 'The store locator is part of Rumbo Maps Pro. You can set it up and preview it now.'|t('rumbo-maps') }}</p>{% endif %}
+    <div class="field">
+      <div class="heading"><label id="rumbo-look-label">{{ 'Look'|t('rumbo-maps') }}</label></div>
+      <div class="rumbo-looks" role="radiogroup" aria-labelledby="{{ 'rumbo-look-label'|namespaceInputId }}" id="rumbo-looks">
+        {%- for l in looks %}
+        <button type="button" class="rumbo-look" role="radio" aria-checked="{{ settings.look == l.value ? 'true' : 'false' }}" tabindex="{{ settings.look == l.value ? '0' : '-1' }}" data-look="{{ l.value }}">
+          <svg viewBox="0 0 120 76" aria-hidden="true" focusable="false"><rect width="120" height="76" rx="4" fill="#f1f3f1"/>{{ l.svg|raw }}</svg>
+          <b>{{ l.label }}</b>
+        </button>
+        {%- endfor %}
+      </div>
+      {{ hiddenInput('look', settings.look, { id: 'rumbo-look' }) }}
+    </div>
+    {{ forms.colorField({ label: 'Accent colour'|t('rumbo-maps'), id: 'rumbo-accent', name: 'accentColor', value: settings.accentColor, errors: settings.getErrors('accentColor') }) }}
+    <p class="rumbo-contrast" id="rumbo-accent-ok" aria-live="polite"></p>
+    {{ forms.colorField({ label: 'Marker colour'|t('rumbo-maps'), id: 'rumbo-marker', name: 'markerColor', value: settings.markerColor, errors: settings.getErrors('markerColor') }) }}
+    <p class="rumbo-contrast" id="rumbo-marker-ok" aria-live="polite"></p>
+    {{ forms.buttonGroupField({ label: 'Corners'|t('rumbo-maps'), id: 'rumbo-corners', name: 'corners', value: settings.corners, options: [{ label: 'Rounded'|t('rumbo-maps'), value: 'rounded' }, { label: 'Square'|t('rumbo-maps'), value: 'square' }] }) }}
+    {{ forms.buttonGroupField({ label: 'Distance unit'|t('rumbo-maps'), id: 'rumbo-unit', name: 'unit', value: settings.unit, options: [{ label: 'Kilometres'|t('rumbo-maps'), value: 'km' }, { label: 'Miles'|t('rumbo-maps'), value: 'mi' }] }) }}
+    <div class="rumbo-two">
+      {{ forms.textField({ label: 'Default search radius'|t('rumbo-maps'), id: 'rumbo-within', name: 'defaultRadius', value: settings.defaultRadius, type: 'number', min: 1, max: 500, size: 5, errors: settings.getErrors('defaultRadius') }) }}
+      {{ forms.textField({ label: 'Results per page'|t('rumbo-maps'), id: 'rumbo-limit', name: 'resultsPerPage', value: settings.resultsPerPage, type: 'number', min: 1, max: 100, size: 5, errors: settings.getErrors('resultsPerPage') }) }}
+    </div>
+  </div>
+  <div class="rumbo-pv">
+    <div class="rumbo-pv__h">
+      <b>{{ 'Live preview'|t('rumbo-maps') }}</b>
+      <span class="rumbo-pv__live"><i></i>{{ 'Example locations'|t('rumbo-maps') }}</span>
+      <span class="flex-grow"></span>
+      <div class="btngroup" id="rumbo-device" role="group" aria-label="{{ 'Preview size'|t('rumbo-maps') }}">
+        <button type="button" class="btn small active" aria-pressed="true" data-v="desk">{{ 'Desktop'|t('rumbo-maps') }}</button>
+        <button type="button" class="btn small" aria-pressed="false" data-v="phone">{{ 'Phone'|t('rumbo-maps') }}</button>
+      </div>
+    </div>
+    <div class="rumbo-pv__stage" id="rumbo-stage">
+      <iframe id="rumbo-pv" title="{{ 'Live preview of the store locator'|t('rumbo-maps') }}" data-base="{{ actionUrl('rumbo-maps/settings/preview') }}" loading="lazy"></iframe>
+    </div>
+  </div>
+</div>
+
+{% css %}
+.rumbo-set{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);margin:-24px -24px -24px;min-height:720px}
+.rumbo-set__form{padding:24px;border-right:1px solid var(--hairline-color,#e3e5e8)}
+.rumbo-looks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rumbo-look{display:block;padding:8px 8px 9px;border:1px solid var(--gray-200,#dfe5ec);border-radius:8px;background:#fff;text-align:left;cursor:pointer}
+.rumbo-look svg{display:block;width:100%;height:auto;border-radius:3px}
+.rumbo-look b{display:block;margin-top:7px;font-size:12.5px;font-weight:600;line-height:1.25;color:var(--gray-800,#33404d)}
+.rumbo-look[aria-checked=true]{border-color:var(--gray-700,#3f4d5a);box-shadow:inset 0 0 0 1px var(--gray-700,#3f4d5a)}
+.rumbo-look:focus-visible{outline:2px solid var(--link-color,#2563eb);outline-offset:1px}
+.rumbo-look-dot{fill:var(--rumbo-pick,#17694f)}
+.rumbo-contrast{margin:-14px 0 20px;font-size:12.5px;font-weight:500;color:#15803d}
+.rumbo-contrast.is-bad{color:#b45309}
+.rumbo-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}.rumbo-two>.field{margin-top:0!important}
+.rumbo-pv{display:flex;flex-direction:column;min-width:0;background:var(--gray-050,#f3f7fc);border-radius:0 var(--large-border-radius,8px) var(--large-border-radius,8px) 0}
+.rumbo-pv__h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--hairline-color,#e3e5e8)}
+.rumbo-pv__live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--light-text-color,#606d7b)}
+.rumbo-pv__live i{width:7px;height:7px;border-radius:50%;background:#22a35a;box-shadow:0 0 0 3px rgba(34,163,90,.18)}
+.rumbo-pv__stage{position:relative;flex:1;min-height:640px;overflow:hidden}
+.rumbo-pv__stage iframe{position:absolute;left:16px;top:16px;border:0;transform-origin:0 0;border-radius:8px;box-shadow:0 8px 28px rgba(20,28,40,.18),0 0 0 1px rgba(20,28,40,.08);background:#fff}
+.rumbo-pv__stage.is-phone iframe{border-radius:28px;box-shadow:0 0 0 6px #1b1f23,0 12px 30px rgba(20,28,40,.3)}
+@media (max-width:1100px){.rumbo-set{grid-template-columns:minmax(0,1fr)}.rumbo-set__form{border-right:0}.rumbo-pv{border-radius:0}}
+{% endcss %}
+
+{% js %}
+(function () {
+  function $id(id) { return document.getElementById(id); }
+  var ns = function (id) { return $id(Craft.namespaceId ? Craft.namespaceId(id, 'settings') : 'settings-' + id) || $id(id); };
+  var frame = ns('rumbo-pv'), stage = ns('rumbo-stage'), looks = ns('rumbo-looks'), lookInput = ns('rumbo-look');
+  if (!frame || !stage) return;
+  var S = { device: 'desk' };
+  var t = {
+    ok: {{ 'Contrast {ratio}:1, passes AA'|t('rumbo-maps')|json_encode|raw }},
+    bad: {{ 'Contrast {ratio}:1, too low for AA'|t('rumbo-maps')|json_encode|raw }}
+  };
+  function val(id) { var el = ns(id); return el ? el.value : ''; }
+  function hex(id) { var v = (val(id) || '').trim(); if (v && v[0] !== '#') v = '#' + v; return /^#[0-9a-f]{6}$/i.test(v) ? v : null; }
+  function lum(h) { var c = [1, 3, 5].map(function (i) { var v = parseInt(h.substr(i, 2), 16) / 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
+  function ratio(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+  function ink(h) { return ratio(h, '#14201b') >= ratio(h, '#ffffff') ? '#14201b' : '#ffffff'; }
+  function check(id, h) {
+    var el = ns(id + '-ok'); if (!el) return;
+    if (!h) { el.textContent = ''; return; }
+    var c = ratio(h, '#ffffff'), r = c.toFixed(1);
+    el.textContent = (c >= 4.5 ? t.ok : t.bad).replace('{ratio}', r);
+    el.classList.toggle('is-bad', c < 4.5);
+  }
+  function paint() {
+    var acc = hex('rumbo-accent'), mk = hex('rumbo-marker') || acc;
+    check('rumbo-accent', acc); check('rumbo-marker', mk);
+    if (looks && mk) looks.style.setProperty('--rumbo-pick', mk);
+    var d; try { d = frame.contentDocument; } catch (e) { d = null; }
+    if (!d || !d.body) return;
+    d.querySelectorAll('.rumbo,.rumbo-mapbox').forEach(function (r) {
+      if (acc) { r.style.setProperty('--rumbo-accent', acc); r.style.setProperty('--rumbo-accent-ink', ink(acc)); }
+      if (mk) { r.style.setProperty('--rumbo-marker', mk); r.style.setProperty('--rumbo-marker-ink', ink(mk)); }
+      r.classList.toggle('rumbo--square', val('rumbo-corners-input') === 'square');
+    });
+  }
+  function fit() {
+    var W = stage.clientWidth - 32, H = stage.clientHeight - 32, ph = S.device === 'phone';
+    var w = ph ? 390 : 1200, s = ph ? Math.min(1, H / 780) : Math.min(1, W / w);
+    // Desktop shows a laptop-sized window (the locator sizes itself to the window), the phone fills the height.
+    var h = ph ? H / s : Math.min(H / s, 800);
+    frame.style.width = w + 'px'; frame.style.height = h + 'px';
+    frame.style.transform = 'scale(' + s + ')';
+    frame.style.left = ph ? (16 + (W - w * s) / 2) + 'px' : '16px';
+    stage.classList.toggle('is-phone', ph);
+  }
+  var key = '';
+  function load() {
+    var q = new URLSearchParams({
+      look: lookInput ? lookInput.value : 'side',
+      unit: val('rumbo-unit-input') || 'km',
+      within: val('rumbo-within') || 25,
+      limit: val('rumbo-limit') || 20
+    });
+    var k = q.toString();
+    fit();
+    if (k === key) { paint(); return; }
+    key = k;
+    var base = frame.getAttribute('data-base');
+    frame.src = base + (base.indexOf('?') < 0 ? '?' : '&') + k;
+  }
+  frame.addEventListener('load', function () { fit(); paint(); });
+  if (looks) {
+    looks.addEventListener('click', function (e) {
+      var b = e.target.closest('.rumbo-look'); if (!b) return;
+      looks.querySelectorAll('.rumbo-look').forEach(function (x) { var on = x === b; x.setAttribute('aria-checked', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; });
+      lookInput.value = b.getAttribute('data-look');
+      load();
+    });
+    looks.addEventListener('keydown', function (e) {
+      if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].indexOf(e.key) < 0) return;
+      var all = Array.prototype.slice.call(looks.querySelectorAll('.rumbo-look')), i = all.indexOf(document.activeElement);
+      var n = all[(i + (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : all.length - 1)) % all.length];
+      e.preventDefault(); n.focus(); n.click();
+    });
+  }
+  var form = stage.closest('form') || document;
+  // Craft's colour and button-group inputs change their values from script, so read them after every interaction.
+  ['input', 'change', 'click', 'keyup'].forEach(function (ev) {
+    form.addEventListener(ev, function (e) {
+      if (!e.target.closest || !e.target.closest('.rumbo-set__form')) return;
+      setTimeout(load, 0);
+    });
+  });
+  var dev = ns('rumbo-device');
+  if (dev) dev.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    dev.querySelectorAll('button').forEach(function (x) { var on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    S.device = b.getAttribute('data-v'); fit();
+  });
+  window.addEventListener('resize', fit);
+  // The tab starts hidden; load the preview the first time it is shown.
+  var pane = stage.closest('#settings-locator') || stage.closest('[id$="locator"]');
+  function visible() { return stage.offsetWidth > 0; }
+  if (visible()) load();
+  else if (pane && window.MutationObserver) {
+    var mo = new MutationObserver(function () { if (visible()) { mo.disconnect(); load(); } });
+    mo.observe(pane, { attributes: true, attributeFilter: ['class'] });
+  }
+  paint();
+})();
+{% endjs %}
