@@ -141,3 +141,5 @@ Google's terms allow keeping looked-up coordinates for at most 30 days, so with 
 ## Support
 
 Email support@facilo.es, or open an issue at https://github.com/Facilo-es/rumbo-maps/issues.
+
+Made by [Facilo](https://facilo.es/).
